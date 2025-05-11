@@ -216,3 +216,120 @@ Please provide an improved version of the character's bio that:
             'status': 'error',
             'message': f'Error improving character bio: {str(e)}'
         }, status=500)
+
+def improve_place_description(request, project_id, place_id):
+    # Get the project and place
+    project = get_object_or_404(Project, pk=project_id)
+    place = get_object_or_404(Place, pk=place_id, project=project)
+    
+    # Configure the Google Generative AI
+    api_key = os.getenv('GOOGLE_API_KEY')
+    if not api_key:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Google API key not found in environment variables'
+        }, status=400)
+    
+    genai.configure(api_key=api_key)
+    
+    # Get the context data
+    context_data, llm_context = get_project_context(project)
+    
+    try:
+        # Initialize the model
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
+        # Create the prompt
+        prompt = f"""Please improve and expand the description for the place "{place.name}" in this writing project. 
+Consider its type, role in the story, and connections to characters and plot points to create a more detailed and engaging place description.
+The description should be consistent with the existing project context and maintain the place's established characteristics and significance.
+It should be plain text, not json and it should have a literary quality. Very aestetic language. Don't add any comments or explanation.
+
+Current place description:
+{place.description}
+
+Here is the full project context:
+{llm_context}
+
+Please provide an improved version of the place's description that:
+1. Expands on its physical characteristics and atmosphere
+2. Incorporates its significance to the story and characters
+3. References its involvement in key plot points
+4. Maintains consistency with its established type and role
+5. Adds depth while staying true to its purpose in the story
+6. Has a literary quality and vivid imagery"""
+        
+        # Generate the improved description
+        response = model.generate_content(prompt)
+        
+        return JsonResponse({
+            'status': 'success',
+            'improved_description': response.text,
+            'place_name': place.name
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error improving place description: {str(e)}'
+        }, status=500)
+
+def improve_organization_description(request, project_id, organization_id):
+    # Get the project and organization
+    project = get_object_or_404(Project, pk=project_id)
+    organization = get_object_or_404(Organization, pk=organization_id, project=project)
+    
+    # Configure the Google Generative AI
+    api_key = os.getenv('GOOGLE_API_KEY')
+    if not api_key:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Google API key not found in environment variables'
+        }, status=400)
+    
+    genai.configure(api_key=api_key)
+    
+    # Get the context data
+    context_data, llm_context = get_project_context(project)
+    
+    try:
+        # Initialize the model
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
+        # Create the prompt
+        prompt = f"""Please improve and expand the description for the organization "{organization.name}" in this writing project. 
+Consider its purpose, members, and role in the story to create a more detailed and engaging organization description.
+The description should be consistent with the existing project context and maintain the organization's established characteristics and significance.
+It should be plain text, not json and it should have a literary quality. Very aestetic language. Don't add any comments or explanation.
+
+Current organization purpose:
+{organization.purpose}
+
+Current organization notes:
+{organization.notes}
+
+Here is the full project context:
+{llm_context}
+
+Please provide an improved version of the organization's description that:
+1. Expands on its purpose and goals
+2. Incorporates its relationships with characters and other organizations
+3. References its involvement in key plot points
+4. Maintains consistency with its established role and influence
+5. Adds depth while staying true to its purpose in the story
+6. Has a literary quality and vivid description of its operations and culture"""
+        
+        # Generate the improved description
+        response = model.generate_content(prompt)
+        
+        return JsonResponse({
+            'status': 'success',
+            'improved_description': response.text,
+            'organization_name': organization.name
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error improving organization description: {str(e)}'
+        }, status=500)

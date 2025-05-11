@@ -7,25 +7,8 @@ import google.generativeai as genai
 
 # Create your views here.
 
-def test_api_key(request):
-    api_key = os.getenv('GOOGLE_API_KEY')
-    if api_key:
-        return JsonResponse({
-            'status': 'success',
-            'message': 'API key is accessible',
-            'key_length': len(api_key)
-        })
-    else:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'API key not found in environment variables'
-        }, status=400)
-
-def test_project_context(request, project_id):
-    # Get the project and all related data
-    project = get_object_or_404(Project, pk=project_id)
-    
-    # Prepare the context data
+def get_project_context(project):
+    """Get the full context of a project including all related data."""
     context_data = {
         'project': {
             'name': project.name,
@@ -102,6 +85,29 @@ Places:
 Organizations:
 {json.dumps(context_data['project']['organizations'], indent=2)}
 """
+    
+    return context_data, llm_context
+
+def test_api_key(request):
+    api_key = os.getenv('GOOGLE_API_KEY')
+    if api_key:
+        return JsonResponse({
+            'status': 'success',
+            'message': 'API key is accessible',
+            'key_length': len(api_key)
+        })
+    else:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'API key not found in environment variables'
+        }, status=400)
+
+def test_project_context(request, project_id):
+    # Get the project and all related data
+    project = get_object_or_404(Project, pk=project_id)
+    
+    # Get the context data
+    context_data, llm_context = get_project_context(project)
     
     return JsonResponse({
         'status': 'success',
@@ -124,82 +130,7 @@ def test_llm_summary(request, project_id):
     genai.configure(api_key=api_key)
     
     # Get the context data
-    context_data = {
-        'project': {
-            'name': project.name,
-            'description': project.description,
-            'characters': [],
-            'plot_points': [],
-            'places': [],
-            'organizations': []
-        }
-    }
-    
-    # Add characters
-    for character in project.characters.all():
-        char_data = {
-            'name': character.name,
-            'role': character.role,
-            'bio': character.bio,
-            'traits': character.traits,
-            'relationships': []
-        }
-        
-        # Add relationships
-        for rel in character.relationships_from.all():
-            char_data['relationships'].append({
-                'to_character': rel.to_character.name,
-                'description': rel.description
-            })
-        
-        context_data['project']['characters'].append(char_data)
-    
-    # Add plot points
-    for plot_point in project.plot_points.all():
-        plot_data = {
-            'title': plot_point.title,
-            'description': plot_point.description,
-            'order': plot_point.order,
-            'characters': [char.name for char in plot_point.characters.all()],
-            'places': [place.name for place in plot_point.places.all()],
-            'organizations': [org.name for org in plot_point.organizations.all()]
-        }
-        context_data['project']['plot_points'].append(plot_data)
-    
-    # Add places
-    for place in project.places.all():
-        context_data['project']['places'].append({
-            'name': place.name,
-            'type': place.type,
-            'description': place.description
-        })
-    
-    # Add organizations
-    for org in project.organizations.all():
-        org_data = {
-            'name': org.name,
-            'purpose': org.purpose,
-            'notes': org.notes,
-            'characters': [char.name for char in org.characters.all()]
-        }
-        context_data['project']['organizations'].append(org_data)
-    
-    # Format the context for the LLM
-    llm_context = f"""Project: {context_data['project']['name']}
-Description: {context_data['project']['description']}
-
-Characters:
-{json.dumps(context_data['project']['characters'], indent=2)}
-
-Plot Points:
-{json.dumps(context_data['project']['plot_points'], indent=2)}
-
-Places:
-{json.dumps(context_data['project']['places'], indent=2)}
-
-Organizations:
-{json.dumps(context_data['project']['organizations'], indent=2)}
-"""
+    context_data, llm_context = get_project_context(project)
     
     try:
         # Initialize the model
@@ -247,82 +178,7 @@ def improve_character_bio(request, project_id, character_id):
     genai.configure(api_key=api_key)
     
     # Get the context data
-    context_data = {
-        'project': {
-            'name': project.name,
-            'description': project.description,
-            'characters': [],
-            'plot_points': [],
-            'places': [],
-            'organizations': []
-        }
-    }
-    
-    # Add characters
-    for char in project.characters.all():
-        char_data = {
-            'name': char.name,
-            'role': char.role,
-            'bio': char.bio,
-            'traits': char.traits,
-            'relationships': []
-        }
-        
-        # Add relationships
-        for rel in char.relationships_from.all():
-            char_data['relationships'].append({
-                'to_character': rel.to_character.name,
-                'description': rel.description
-            })
-        
-        context_data['project']['characters'].append(char_data)
-    
-    # Add plot points
-    for plot_point in project.plot_points.all():
-        plot_data = {
-            'title': plot_point.title,
-            'description': plot_point.description,
-            'order': plot_point.order,
-            'characters': [char.name for char in plot_point.characters.all()],
-            'places': [place.name for place in plot_point.places.all()],
-            'organizations': [org.name for org in plot_point.organizations.all()]
-        }
-        context_data['project']['plot_points'].append(plot_data)
-    
-    # Add places
-    for place in project.places.all():
-        context_data['project']['places'].append({
-            'name': place.name,
-            'type': place.type,
-            'description': place.description
-        })
-    
-    # Add organizations
-    for org in project.organizations.all():
-        org_data = {
-            'name': org.name,
-            'purpose': org.purpose,
-            'notes': org.notes,
-            'characters': [char.name for char in org.characters.all()]
-        }
-        context_data['project']['organizations'].append(org_data)
-    
-    # Format the context for the LLM
-    llm_context = f"""Project: {context_data['project']['name']}
-Description: {context_data['project']['description']}
-
-Characters:
-{json.dumps(context_data['project']['characters'], indent=2)}
-
-Plot Points:
-{json.dumps(context_data['project']['plot_points'], indent=2)}
-
-Places:
-{json.dumps(context_data['project']['places'], indent=2)}
-
-Organizations:
-{json.dumps(context_data['project']['organizations'], indent=2)}
-"""
+    context_data, llm_context = get_project_context(project)
     
     try:
         # Initialize the model

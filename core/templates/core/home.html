@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Writing App</h1>
+{% if user.is_authenticated %}
+    <p>Hello, {{ user.username }}! You are logged in.</p>
+    <div class="home-actions">
+        <a href="{% url 'project_list' %}" class="btn">View My Projects</a>
+    </div>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">register</a> to get started.</p>
+{% endif %}
+
+<style>
+    .home-actions {
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %} 

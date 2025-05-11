@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+
+{% block title %}My Projects{% endblock %}
+
+{% block content %}
+<div class="projects-header">
+    <h1>My Projects</h1>
+    <a href="{% url 'project_create' %}" class="btn">Create New Project</a>
+</div>
+
+{% if projects %}
+    <div class="projects-grid">
+        {% for project in projects %}
+            <div class="project-card">
+                <h3>{{ project.name }}</h3>
+                <p>{{ project.description|truncatewords:30 }}</p>
+                <div class="project-meta">
+                    <small>Created: {{ project.created_at|date:"M d, Y" }}</small>
+                </div>
+                <div class="project-actions">
+                    <a href="{% url 'character_list' project.pk %}" class="btn btn-small btn-info">Characters</a>
+                    <a href="{% url 'project_edit' project.pk %}" class="btn btn-small">Edit</a>
+                    <a href="{% url 'project_delete' project.pk %}" class="btn btn-small btn-danger">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>You haven't created any projects yet. <a href="{% url 'project_create' %}">Create your first project</a>!</p>
+{% endif %}
+
+<style>
+    .projects-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .project-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .project-card h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    .project-meta {
+        margin: 1rem 0;
+        color: #666;
+    }
+    .project-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+    }
+    .btn-info:hover {
+        background-color: #138496;
+    }
+</style>
+{% endblock %} 

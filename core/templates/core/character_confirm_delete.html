@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Delete Character{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <h1>Delete Character</h1>
+    <p>Are you sure you want to delete the character "{{ character.name }}" from "{{ project.name }}"?</p>
+    <p class="warning">This action cannot be undone.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete Character</button>
+            <a href="{% url 'character_list' project.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .delete-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .warning {
+        color: #dc3545;
+        font-weight: bold;
+        margin: 1rem 0;
+    }
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %} 

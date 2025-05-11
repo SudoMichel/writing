@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ action }} Organization</h2>
+    
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ organization.name|default:'' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="purpose" class="form-label">Purpose</label>
+            <textarea class="form-control" id="purpose" name="purpose" rows="3" required>{{ organization.purpose|default:'' }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3">{{ organization.notes|default:'' }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Members</label>
+            <div class="row">
+                {% for character in characters %}
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
+                                {% if organization and character in organization.characters.all %}checked{% endif %}>
+                            <label class="form-check-label" for="character_{{ character.id }}">
+                                {{ character.name }}
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">{{ action }}</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

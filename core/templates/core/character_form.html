@@ -1,0 +1,77 @@
+{% extends 'core/base.html' %}
+{% load core_extras %}
+
+{% block title %}{{ action }} Character - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">{{ action }} Character</h1>
+        
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">Character Details</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Name *</label>
+                        <input type="text" name="name" id="name" value="{{ character.name|default:'' }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700">Role *</label>
+                        <input type="text" name="role" id="role" value="{{ character.role|default:'' }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div>
+                        <label for="bio" class="block text-sm font-medium text-gray-700">Bio *</label>
+                        <textarea name="bio" id="bio" rows="4" required
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ character.bio|default:'' }}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="traits" class="block text-sm font-medium text-gray-700">Character Traits</label>
+                        <textarea name="traits" id="traits" rows="3"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ character.traits|default:'' }}</textarea>
+                        <p class="mt-1 text-sm text-gray-500">Example: Brave, Loyal, Quick-tempered, etc.</p>
+                    </div>
+                </div>
+            </div>
+            
+            {% if project.characters.count > 1 %}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">Relationships</h2>
+                <p class="text-sm text-gray-600 mb-4">Describe this character's relationship with other characters in the project.</p>
+                
+                <div class="space-y-6">
+                    {% for other_character in project.characters.all %}
+                        {% if other_character.id != character.id %}
+                        <div class="border rounded-lg p-4">
+                            <label for="relationship_{{ other_character.id }}" class="block text-sm font-medium text-gray-700">
+                                Relationship with {{ other_character.name }}
+                            </label>
+                            <textarea name="relationship_{{ other_character.id }}" id="relationship_{{ other_character.id }}" rows="2"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ relationships|get_item:other_character.id|default:'' }}</textarea>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="flex justify-between items-center">
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
+                    Save Character
+                </button>
+                <a href="{% url 'project_edit' project.id %}" class="text-gray-600 hover:text-gray-800">
+                    Back to Project
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

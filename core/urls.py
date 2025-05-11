@@ -1,0 +1,28 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('projects/', views.project_list, name='project_list'),
+    path('projects/create/', views.project_create, name='project_create'),
+    path('projects/<int:pk>/edit/', views.project_edit, name='project_edit'),
+    path('projects/<int:pk>/delete/', views.project_delete, name='project_delete'),
+    path('projects/<int:project_id>/characters/', views.character_list, name='character_list'),
+    path('projects/<int:project_id>/characters/create/', views.character_create, name='character_create'),
+    path('projects/<int:project_id>/characters/<int:character_id>/edit/', views.character_edit, name='character_edit'),
+    path('projects/<int:project_id>/characters/<int:character_id>/delete/', views.character_delete, name='character_delete'),
+    path('projects/<int:project_id>/places/create/', views.place_create, name='place_create'),
+    path('projects/<int:project_id>/places/<int:place_id>/edit/', views.place_edit, name='place_edit'),
+    path('projects/<int:project_id>/places/<int:place_id>/delete/', views.place_delete, name='place_delete'),
+    path('projects/<int:project_id>/organizations/', views.organization_list, name='organization_list'),
+    path('projects/<int:project_id>/organizations/create/', views.organization_create, name='organization_create'),
+    path('projects/<int:project_id>/organizations/<int:organization_id>/edit/', views.organization_edit, name='organization_edit'),
+    path('projects/<int:project_id>/organizations/<int:organization_id>/delete/', views.organization_delete, name='organization_delete'),
+    path('projects/<int:project_id>/plotpoints/', views.plotpoint_list, name='plotpoint_list'),
+    path('projects/<int:project_id>/plotpoints/create/', views.plotpoint_create, name='plotpoint_create'),
+    path('projects/<int:project_id>/plotpoints/<int:plotpoint_id>/edit/', views.plotpoint_edit, name='plotpoint_edit'),
+    path('projects/<int:project_id>/plotpoints/<int:plotpoint_id>/delete/', views.plotpoint_delete, name='plotpoint_delete'),
+    path('projects/<int:project_id>/plotpoints/reorder/', views.plotpoint_reorder, name='plotpoint_reorder'),
+] 

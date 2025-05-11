@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ action }} Plot Point</h2>
+    
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="order" class="form-label">Order</label>
+            <input type="number" class="form-control" id="order" name="order" value="{{ plot_point.order|default:'0' }}" min="0">
+        </div>
+        
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ plot_point.title|default:'' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5" required>{{ plot_point.description|default:'' }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Characters</label>
+            <div class="row">
+                {% for character in characters %}
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
+                                {% if plot_point and character in plot_point.characters.all %}checked{% endif %}>
+                            <label class="form-check-label" for="character_{{ character.id }}">
+                                {{ character.name }}
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Places</label>
+            <div class="row">
+                {% for place in places %}
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="places" value="{{ place.id }}" id="place_{{ place.id }}"
+                                {% if plot_point and place in plot_point.places.all %}checked{% endif %}>
+                            <label class="form-check-label" for="place_{{ place.id }}">
+                                {{ place.name }}
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Organizations</label>
+            <div class="row">
+                {% for organization in organizations %}
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="organizations" value="{{ organization.id }}" id="organization_{{ organization.id }}"
+                                {% if plot_point and organization in plot_point.organizations.all %}checked{% endif %}>
+                            <label class="form-check-label" for="organization_{{ organization.id }}">
+                                {{ organization.name }}
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">{{ action }}</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

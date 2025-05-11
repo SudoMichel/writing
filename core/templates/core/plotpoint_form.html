@@ -1,82 +1,163 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ action }} Plot Point</h2>
-    
-    <form method="post" class="mt-4">
+<div class="project-editor">
+    <form method="post" class="project-form">
         {% csrf_token %}
         
-        <div class="mb-3">
-            <label for="order" class="form-label">Order</label>
-            <input type="number" class="form-control" id="order" name="order" value="{{ plot_point.order|default:'0' }}" min="0">
+        <div class="form-section">
+            <h2>Plot Point Details</h2>
+            <div class="form-group">
+                <label for="order">Order</label>
+                <input type="number" id="order" name="order" value="{{ plot_point.order|default:'0' }}" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="title">Title *</label>
+                <input type="text" id="title" name="title" value="{{ plot_point.title|default:'' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" rows="5" required>{{ plot_point.description|default:'' }}</textarea>
+            </div>
         </div>
         
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ plot_point.title|default:'' }}" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="5" required>{{ plot_point.description|default:'' }}</textarea>
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Characters</label>
-            <div class="row">
+        <div class="form-section">
+            <h2>Characters</h2>
+            <div class="associations-grid">
                 {% for character in characters %}
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
+                    <div class="association-card">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
                                 {% if plot_point and character in plot_point.characters.all %}checked{% endif %}>
-                            <label class="form-check-label" for="character_{{ character.id }}">
-                                {{ character.name }}
-                            </label>
-                        </div>
+                            <span>{{ character.name }}</span>
+                        </label>
                     </div>
                 {% endfor %}
             </div>
         </div>
         
-        <div class="mb-3">
-            <label class="form-label">Places</label>
-            <div class="row">
+        <div class="form-section">
+            <h2>Places</h2>
+            <div class="associations-grid">
                 {% for place in places %}
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="places" value="{{ place.id }}" id="place_{{ place.id }}"
+                    <div class="association-card">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="places" value="{{ place.id }}" id="place_{{ place.id }}"
                                 {% if plot_point and place in plot_point.places.all %}checked{% endif %}>
-                            <label class="form-check-label" for="place_{{ place.id }}">
-                                {{ place.name }}
-                            </label>
-                        </div>
+                            <span>{{ place.name }}</span>
+                        </label>
                     </div>
                 {% endfor %}
             </div>
         </div>
         
-        <div class="mb-3">
-            <label class="form-label">Organizations</label>
-            <div class="row">
+        <div class="form-section">
+            <h2>Organizations</h2>
+            <div class="associations-grid">
                 {% for organization in organizations %}
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="organizations" value="{{ organization.id }}" id="organization_{{ organization.id }}"
+                    <div class="association-card">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="organizations" value="{{ organization.id }}" id="organization_{{ organization.id }}"
                                 {% if plot_point and organization in plot_point.organizations.all %}checked{% endif %}>
-                            <label class="form-check-label" for="organization_{{ organization.id }}">
-                                {{ organization.name }}
-                            </label>
-                        </div>
+                            <span>{{ organization.name }}</span>
+                        </label>
                     </div>
                 {% endfor %}
             </div>
         </div>
         
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary">{{ action }}</button>
-            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Cancel</a>
+        <div class="form-actions">
+            <button type="submit" class="btn">{{ action }}</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
         </div>
     </form>
 </div>
+
+<style>
+    .project-editor {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .project-form {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+    .form-section {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    .form-group textarea {
+        resize: vertical;
+    }
+    .associations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .association-card {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 1rem;
+    }
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+    }
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+</style>
 {% endblock %} 

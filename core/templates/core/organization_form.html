@@ -1,48 +1,133 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ action }} Organization</h2>
-    
-    <form method="post" class="mt-4">
+<div class="project-editor">
+    <form method="post" class="project-form">
         {% csrf_token %}
         
-        <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ organization.name|default:'' }}" required>
+        <div class="form-section">
+            <h2>Organization Details</h2>
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" value="{{ organization.name|default:'' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="purpose">Purpose *</label>
+                <textarea id="purpose" name="purpose" rows="3" required>{{ organization.purpose|default:'' }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" rows="3">{{ organization.notes|default:'' }}</textarea>
+            </div>
         </div>
         
-        <div class="mb-3">
-            <label for="purpose" class="form-label">Purpose</label>
-            <textarea class="form-control" id="purpose" name="purpose" rows="3" required>{{ organization.purpose|default:'' }}</textarea>
-        </div>
-        
-        <div class="mb-3">
-            <label for="notes" class="form-label">Notes</label>
-            <textarea class="form-control" id="notes" name="notes" rows="3">{{ organization.notes|default:'' }}</textarea>
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Members</label>
-            <div class="row">
+        <div class="form-section">
+            <h2>Members</h2>
+            <div class="members-grid">
                 {% for character in characters %}
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
+                    <div class="member-card">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
                                 {% if organization and character in organization.characters.all %}checked{% endif %}>
-                            <label class="form-check-label" for="character_{{ character.id }}">
-                                {{ character.name }}
-                            </label>
-                        </div>
+                            <span>{{ character.name }}</span>
+                        </label>
                     </div>
                 {% endfor %}
             </div>
         </div>
         
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary">{{ action }}</button>
-            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Cancel</a>
+        <div class="form-actions">
+            <button type="submit" class="btn">{{ action }}</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
         </div>
     </form>
 </div>
+
+<style>
+    .project-editor {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .project-form {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+    .form-section {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    .form-group textarea {
+        resize: vertical;
+    }
+    .members-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .member-card {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 1rem;
+    }
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+    }
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+</style>
 {% endblock %} 

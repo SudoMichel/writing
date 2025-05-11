@@ -3,39 +3,96 @@
 {% block title %}{{ action }} Place - {{ project.name }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">{{ action }} Place</h1>
-        <form method="post" class="space-y-8">
-            {% csrf_token %}
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Name *</label>
-                        <input type="text" name="name" id="name" value="{{ place.name|default:'' }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label for="type" class="block text-sm font-medium text-gray-700">Type *</label>
-                        <input type="text" name="type" id="type" value="{{ place.type|default:'' }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description *</label>
-                        <textarea name="description" id="description" rows="4" required
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ place.description|default:'' }}</textarea>
-                    </div>
-                </div>
+<div class="project-editor">
+    <form method="post" class="project-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h2>Place Details</h2>
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" value="{{ place.name|default:'' }}" required>
             </div>
-            <div class="flex justify-between items-center">
-                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
-                    Save Place
-                </button>
-                <a href="{% url 'project_edit' project.id %}" class="text-gray-600 hover:text-gray-800">
-                    Back to Project
-                </a>
+            
+            <div class="form-group">
+                <label for="type">Type *</label>
+                <input type="text" id="type" name="type" value="{{ place.type|default:'' }}" required>
             </div>
-        </form>
-    </div>
+            
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" rows="4" required>{{ place.description|default:'' }}</textarea>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn">Save Place</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
+        </div>
+    </form>
 </div>
+
+<style>
+    .project-editor {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .project-form {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+    .form-section {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    .form-group textarea {
+        resize: vertical;
+    }
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+</style>
 {% endblock %} 

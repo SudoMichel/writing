@@ -22,7 +22,15 @@
             
             <div class="form-group">
                 <label for="bio">Bio *</label>
-                <textarea id="bio" name="bio" rows="4" required>{{ character.bio|default:'' }}</textarea>
+                <div class="bio-container">
+                    <textarea id="bio" name="bio" rows="4" required>{{ character.bio|default:'' }}</textarea>
+                    {% if character %}
+                    <button type="button" id="improve-bio" class="btn btn-ai" onclick="improveBio()">
+                        Improve with AI
+                    </button>
+                    {% endif %}
+                </div>
+                <div id="improvement-status" class="improvement-status"></div>
             </div>
             
             <div class="form-group">
@@ -150,5 +158,64 @@
     .btn-secondary:hover {
         background: #e9ecef;
     }
+    .bio-container {
+        position: relative;
+    }
+    .btn-ai {
+        position: absolute;
+        right: 0.5rem;
+        top: 0.5rem;
+        background: #4a90e2;
+        color: white;
+        border: none;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    .btn-ai:hover {
+        background: #357abd;
+    }
+    .improvement-status {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .improvement-status.loading {
+        color: #4a90e2;
+    }
+    .improvement-status.error {
+        color: #dc3545;
+    }
+    .improvement-status.success {
+        color: #28a745;
+    }
 </style>
+
+<script>
+async function improveBio() {
+    const statusDiv = document.getElementById('improvement-status');
+    const improveButton = document.getElementById('improve-bio');
+    const bioTextarea = document.getElementById('bio');
+    
+    try {
+        statusDiv.textContent = 'Improving bio...';
+        statusDiv.className = 'improvement-status loading';
+        improveButton.disabled = true;
+        
+        const response = await fetch(`/ai/improve-character-bio/{{ project.id }}/{{ character.id }}/`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            bioTextarea.value = data.improved_bio;
+            statusDiv.textContent = 'Bio improved successfully!';
+            statusDiv.className = 'improvement-status success';
+        } else {
+            throw new Error(data.message || 'Failed to improve bio');
+        }
+    } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.className = 'improvement-status error';
+    } finally {
+        improveButton.disabled = false;
+    }
+}
+</script>
 {% endblock %} 

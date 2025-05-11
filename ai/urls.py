@@ -7,4 +7,5 @@ urlpatterns = [
     path('test-api-key/', views.test_api_key, name='test_api_key'),
     path('test-project-context/<int:project_id>/', views.test_project_context, name='test_project_context'),
     path('test-llm-summary/<int:project_id>/', views.test_llm_summary, name='test_llm_summary'),
+    path('improve-character-bio/<int:project_id>/<int:character_id>/', views.improve_character_bio, name='improve_character_bio'),
 ] 

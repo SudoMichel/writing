@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Project, Character, CharacterRelationship, Place, Organization, PlotPoint
+from .models import Project, Character, CharacterRelationship, Place, Organization, PlotPoint, ResearchNote
 
 
 def register_view(request):
@@ -469,3 +469,74 @@ def plotpoint_reorder(request, project_id):
         return redirect('project_edit', pk=project.id)
     
     return redirect('project_edit', pk=project.id)
+
+@login_required
+def researchnote_create(request, project_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        tags = request.POST.get('tags', '')
+        file = request.FILES.get('file')
+        
+        if title and content:
+            note = ResearchNote.objects.create(
+                title=title,
+                content=content,
+                tags=tags,
+                file=file,
+                project=project
+            )
+            messages.success(request, 'Research note created successfully!')
+            return redirect('project_edit', pk=project.id)
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    return render(request, 'core/researchnote_form.html', {
+        'project': project,
+        'action': 'Create'
+    })
+
+@login_required
+def researchnote_edit(request, project_id, note_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    note = get_object_or_404(ResearchNote, pk=note_id, project=project)
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        tags = request.POST.get('tags', '')
+        file = request.FILES.get('file')
+        
+        if title and content:
+            note.title = title
+            note.content = content
+            note.tags = tags
+            if file:
+                note.file = file
+            note.save()
+            messages.success(request, 'Research note updated successfully!')
+            return redirect('project_edit', pk=project.id)
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    return render(request, 'core/researchnote_form.html', {
+        'project': project,
+        'note': note,
+        'action': 'Edit'
+    })
+
+@login_required
+def researchnote_delete(request, project_id, note_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    note = get_object_or_404(ResearchNote, pk=note_id, project=project)
+    
+    if request.method == 'POST':
+        note.delete()
+        messages.success(request, 'Research note deleted successfully!')
+        return redirect('project_edit', pk=project.id)
+    
+    return render(request, 'core/researchnote_confirm_delete.html', {
+        'project': project,
+        'note': note
+    })

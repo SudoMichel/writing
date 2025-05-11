@@ -82,3 +82,18 @@ class PlotPoint(models.Model):
 
     class Meta:
         ordering = ['order', 'created_at']
+
+class ResearchNote(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    tags = models.CharField(max_length=500, blank=True, help_text="Enter tags separated by commas")
+    file = models.FileField(upload_to='research_notes/', blank=True, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='research_notes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-updated_at']

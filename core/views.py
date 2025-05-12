@@ -198,6 +198,15 @@ def character_delete(request, project_id, character_id):
     })
 
 @login_required
+def place_list(request, project_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    places = project.places.all()
+    return render(request, 'core/place_list.html', {
+        'project': project,
+        'places': places
+    })
+
+@login_required
 def place_create(request, project_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
     if request.method == 'POST':

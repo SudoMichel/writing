@@ -1,0 +1,83 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Places - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="places-header">
+    <div>
+        <h1>Places in {{ project.name }}</h1>
+        <p class="project-description">{{ project.description }}</p>
+    </div>
+    <a href="{% url 'place_create' project.id %}" class="btn">Add Place</a>
+</div>
+
+{% if places %}
+    <div class="places-grid">
+        {% for place in places %}
+            <div class="place-card">
+                <h3>{{ place.name }}</h3>
+                <p class="place-type">{{ place.type }}</p>
+                <div class="place-description">
+                    <p>{{ place.description|truncatewords:30 }}</p>
+                </div>
+                <div class="place-actions">
+                    <a href="{% url 'place_edit' project.id place.id %}" class="btn btn-small">Edit</a>
+                    <a href="{% url 'place_delete' project.id place.id %}" class="btn btn-small btn-danger">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No places created yet. <a href="{% url 'place_create' project.id %}">Add your first place</a>!</p>
+{% endif %}
+
+<div class="back-link">
+    <a href="{% url 'project_list' %}" class="btn btn-secondary">Back to Projects</a>
+</div>
+
+<style>
+    .places-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+    .project-description {
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    .places-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .place-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .place-card h3 {
+        margin: 0;
+        color: #333;
+    }
+    .place-type {
+        color: #666;
+        font-style: italic;
+        margin: 0.5rem 0;
+    }
+    .place-description {
+        margin: 1rem 0;
+    }
+    .place-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .back-link {
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %} 

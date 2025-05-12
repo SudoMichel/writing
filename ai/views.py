@@ -5,7 +5,6 @@ from core.models import Project, Character, PlotPoint, Place, Organization
 import json
 import google.generativeai as genai
 
-# Create your views here.
 
 def get_project_context(project):
     """Get the full context of a project including all related data."""

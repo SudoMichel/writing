@@ -18,7 +18,6 @@
                     <small>Created: {{ project.created_at|date:"M d, Y" }}</small>
                 </div>
                 <div class="project-actions">
-                    <a href="{% url 'character_list' project.pk %}" class="btn btn-small btn-info">Characters</a>
                     <a href="{% url 'project_edit' project.pk %}" class="btn btn-small">Edit</a>
                     <a href="{% url 'project_delete' project.pk %}" class="btn btn-small btn-danger">Delete</a>
                 </div>

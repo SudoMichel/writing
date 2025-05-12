@@ -13,6 +13,7 @@ urlpatterns = [
     path('projects/<int:project_id>/characters/create/', views.character_create, name='character_create'),
     path('projects/<int:project_id>/characters/<int:character_id>/edit/', views.character_edit, name='character_edit'),
     path('projects/<int:project_id>/characters/<int:character_id>/delete/', views.character_delete, name='character_delete'),
+    path('projects/<int:project_id>/places/', views.place_list, name='place_list'),
     path('projects/<int:project_id>/places/create/', views.place_create, name='place_create'),
     path('projects/<int:project_id>/places/<int:place_id>/edit/', views.place_edit, name='place_edit'),
     path('projects/<int:project_id>/places/<int:place_id>/delete/', views.place_delete, name='place_delete'),

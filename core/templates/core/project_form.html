@@ -21,7 +21,10 @@
         {% if project %}
         <div class="form-section">
             <div class="section-header">
-                <h2>Characters</h2>
+                <div class="section-title">
+                    <h2>Characters</h2>
+                    <a href="{% url 'character_list' project.id %}" class="view-all-link">View All Characters</a>
+                </div>
                 <a href="{% url 'character_create' project.id %}" class="btn btn-small">Add Character</a>
             </div>
             
@@ -47,7 +50,10 @@
         </div>
         <div class="form-section">
             <div class="section-header">
-                <h2>Places</h2>
+                <div class="section-title">
+                    <h2>Places</h2>
+                    <a href="{% url 'place_list' project.id %}" class="view-all-link">View All Places</a>
+                </div>
                 <a href="{% url 'place_create' project.id %}" class="btn btn-small">Add Place</a>
             </div>
             {% if project.places.all %}
@@ -72,7 +78,10 @@
         </div>
         <div class="form-section">
             <div class="section-header">
-                <h2>Organizations</h2>
+                <div class="section-title">
+                    <h2>Organizations</h2>
+                    <a href="{% url 'organization_list' project.id %}" class="view-all-link">View All Organizations</a>
+                </div>
                 <a href="{% url 'organization_create' project.id %}" class="btn btn-small">Add Organization</a>
             </div>
             {% if project.organizations.all %}
@@ -101,7 +110,10 @@
 
         <div class="form-section">
             <div class="section-header">
-                <h2>Plot Points</h2>
+                <div class="section-title">
+                    <h2>Plot Points</h2>
+                    <a href="{% url 'plotpoint_list' project.id %}" class="view-all-link">View All Plot Points</a>
+                </div>
                 <a href="{% url 'plotpoint_create' project.id %}" class="btn btn-small">Add Plot Point</a>
             </div>
             {% if project.plot_points.all %}
@@ -148,7 +160,10 @@
 
         <div class="form-section">
             <div class="section-header">
-                <h2>Research Notes</h2>
+                <div class="section-title">
+                    <h2>Research Notes</h2>
+                    <a href="{% url 'researchnote_list' project.id %}" class="view-all-link">View All Research Notes</a>
+                </div>
                 <a href="{% url 'researchnote_create' project.id %}" class="btn btn-small">Add Research Note</a>
             </div>
             {% if project.research_notes.all %}
@@ -224,8 +239,22 @@
         align-items: center;
         margin-bottom: 1.5rem;
     }
-    .section-header h2 {
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .section-title h2 {
         margin: 0;
+    }
+    .view-all-link {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .view-all-link:hover {
+        color: #333;
+        text-decoration: underline;
     }
     .form-group {
         margin-bottom: 1.5rem;

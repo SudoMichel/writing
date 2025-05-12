@@ -549,3 +549,12 @@ def researchnote_delete(request, project_id, note_id):
         'project': project,
         'note': note
     })
+
+@login_required
+def researchnote_list(request, project_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    research_notes = project.research_notes.all()
+    return render(request, 'core/researchnote_list.html', {
+        'project': project,
+        'research_notes': research_notes
+    })

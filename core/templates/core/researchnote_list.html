@@ -1,0 +1,174 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Research Notes - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="research-notes-container">
+    <div class="page-header">
+        <h1>Research Notes - {{ project.name }}</h1>
+        <div class="header-actions">
+            <a href="{% url 'researchnote_create' project.id %}" class="btn">Add Research Note</a>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
+        </div>
+    </div>
+
+    {% if research_notes %}
+        <div class="research-notes-grid">
+            {% for note in research_notes %}
+                <div class="research-note-card">
+                    <h3>{{ note.title }}</h3>
+                    <div class="note-content">
+                        <p>{{ note.content|truncatewords:30 }}</p>
+                        {% if note.tags %}
+                            <div class="note-tags">
+                                {% for tag in note.tags.split %}
+                                    <span class="tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if note.file %}
+                            <div class="note-file">
+                                <a href="{{ note.file.url }}" target="_blank" class="file-link">
+                                    <i class="fas fa-file"></i> {{ note.file.name }}
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="note-meta">
+                        <small>Last updated: {{ note.updated_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="note-actions">
+                        <a href="{% url 'researchnote_edit' project.id note.id %}" class="btn btn-small">Edit</a>
+                        <a href="{% url 'researchnote_delete' project.id note.id %}" class="btn btn-small btn-danger">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-notes">No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first research note</a>!</p>
+    {% endif %}
+</div>
+
+<style>
+    .research-notes-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    .page-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #333;
+    }
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    .research-notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .research-note-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .research-note-card h3 {
+        margin: 0 0 1rem 0;
+        color: #333;
+        font-size: 1.2rem;
+    }
+    .note-content {
+        margin-bottom: 1rem;
+    }
+    .note-content p {
+        margin: 0 0 1rem 0;
+        color: #666;
+        line-height: 1.5;
+    }
+    .note-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .tag {
+        background: #e9ecef;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        color: #495057;
+    }
+    .note-file {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .file-link {
+        color: #666;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .file-link:hover {
+        color: #333;
+    }
+    .note-meta {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: #888;
+    }
+    .note-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+    .no-notes {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .btn:hover {
+        background: #0056b3;
+    }
+    .btn-secondary {
+        background: #6c757d;
+    }
+    .btn-secondary:hover {
+        background: #545b62;
+    }
+    .btn-small {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    .btn-danger {
+        background: #dc3545;
+    }
+    .btn-danger:hover {
+        background: #c82333;
+    }
+</style>
+{% endblock %} 

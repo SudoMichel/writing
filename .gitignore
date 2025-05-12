@@ -38,9 +38,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-include
-lib
-bin
+
 
 # IDE
 .idea/

@@ -1,10 +1,13 @@
 {% extends 'core/base.html' %}
 
+
+
+
 {% block title %}{{ action }} Project{% endblock %}
 
 {% block content %}
 <div class="project-editor">
-    <form method="post" class="project-form">
+    <form method="post" class="project-form" data-csrf-token="{{ csrf_token }}">
         {% csrf_token %}
         <div class="form-section">
             <h2>Project Details</h2>
@@ -14,442 +17,150 @@
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea id="description" name="description" rows="5" required>{{ project.description|default:'' }}</textarea>
+                <textarea id="description" name="description" rows="8" required>{{ project.description|default:'' }}</textarea>
             </div>
         </div>
 
         {% if project %}
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <h2>Characters</h2>
-                    <a href="{% url 'character_list' project.id %}" class="view-all-link">View All Characters</a>
-                </div>
-                <a href="{% url 'character_create' project.id %}" class="btn btn-small">Add Character</a>
-            </div>
             
-            {% if project.characters.all %}
-                <div class="characters-grid">
+            <div class="form-section">
+                {% include "core/_includes/section_header.html" with section_title="Characters" view_all_url_name='character_list' add_url_name='character_create' project_id=project.id %}
+                {% if project.characters.all %}
+                    <div class="items-grid">
                     {% for character in project.characters.all %}
-                        <div class="character-card">
-                            <h3>{{ character.name }}</h3>
-                            <p class="character-role">{{ character.role }}</p>
-                            <div class="character-bio">
-                                <p>{{ character.bio|truncatewords:20 }}</p>
-                            </div>
-                            <div class="character-actions">
-                                <a href="{% url 'character_edit' project.id character.id %}" class="btn btn-small">Edit</a>
-                                <a href="{% url 'character_delete' project.id character.id %}" class="btn btn-small btn-danger">Delete</a>
-                            </div>
-                        </div>
+                        {% include "core/_includes/item_card.html" with item=character item_type='character' project_id=project.id edit_url_name='character_edit' delete_url_name='character_delete' %}
                     {% endfor %}
-                </div>
-            {% else %}
-                <p class="no-characters">No characters created yet. <a href="{% url 'character_create' project.id %}">Add your first character</a>!</p>
-            {% endif %}
-        </div>
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <h2>Places</h2>
-                    <a href="{% url 'place_list' project.id %}" class="view-all-link">View All Places</a>
-                </div>
-                <a href="{% url 'place_create' project.id %}" class="btn btn-small">Add Place</a>
-            </div>
-            {% if project.places.all %}
-                <div class="characters-grid">
-                    {% for place in project.places.all %}
-                        <div class="character-card">
-                            <h3>{{ place.name }}</h3>
-                            <p class="character-role">{{ place.type }}</p>
-                            <div class="character-bio">
-                                <p>{{ place.description|truncatewords:20 }}</p>
-                            </div>
-                            <div class="character-actions">
-                                <a href="{% url 'place_edit' project.id place.id %}" class="btn btn-small">Edit</a>
-                                <a href="{% url 'place_delete' project.id place.id %}" class="btn btn-small btn-danger">Delete</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="no-characters">No places created yet. <a href="{% url 'place_create' project.id %}">Add your first place</a>!</p>
-            {% endif %}
-        </div>
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <h2>Organizations</h2>
-                    <a href="{% url 'organization_list' project.id %}" class="view-all-link">View All Organizations</a>
-                </div>
-                <a href="{% url 'organization_create' project.id %}" class="btn btn-small">Add Organization</a>
-            </div>
-            {% if project.organizations.all %}
-                <div class="characters-grid">
-                    {% for organization in project.organizations.all %}
-                        <div class="character-card">
-                            <h3>{{ organization.name }}</h3>
-                            <p class="character-role">Purpose: {{ organization.purpose|truncatewords:10 }}</p>
-                            <div class="character-bio">
-                                <p>{{ organization.notes|truncatewords:20 }}</p>
-                                {% if organization.characters.all %}
-                                    <p class="mt-2"><strong>Members:</strong> {{ organization.characters.all|join:", " }}</p>
-                                {% endif %}
-                            </div>
-                            <div class="character-actions">
-                                <a href="{% url 'organization_edit' project.id organization.id %}" class="btn btn-small">Edit</a>
-                                <a href="{% url 'organization_delete' project.id organization.id %}" class="btn btn-small btn-danger">Delete</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="no-characters">No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
-            {% endif %}
-        </div>
+                    </div>
+                {% else %}
+                    <p class="no-items">No characters created yet. <a href="{% url 'character_create' project.id %}">Add your first character</a>!</p> {# Generic class name #}
+                {% endif %}
+            </div> 
 
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <h2>Plot Points</h2>
-                    <a href="{% url 'plotpoint_list' project.id %}" class="view-all-link">View All Plot Points</a>
-                </div>
-                <a href="{% url 'plotpoint_create' project.id %}" class="btn btn-small">Add Plot Point</a>
-            </div>
-            {% if project.plot_points.all %}
-                <div class="plotpoints-list">
-                    {% for plot_point in project.plot_points.all %}
-                        <div class="plotpoint-item" data-id="{{ plot_point.id }}">
-                            <div class="plotpoint-content">
-                                <div class="plotpoint-header">
-                                    <span class="plotpoint-order">{{ plot_point.order }}.</span>
-                                    <span class="plotpoint-title">{{ plot_point.title }}</span>
-                                </div>
-                                <div class="plotpoint-details">
-                                    <p>{{ plot_point.description|truncatewords:15 }}</p>
-                                    {% if plot_point.characters.all or plot_point.places.all or plot_point.organizations.all %}
-                                        <div class="plotpoint-relations">
-                                            {% if plot_point.characters.all %}
-                                                <span class="relation-tag">Characters: {{ plot_point.characters.all|join:", " }}</span>
-                                            {% endif %}
-                                            {% if plot_point.places.all %}
-                                                <span class="relation-tag">Places: {{ plot_point.places.all|join:", " }}</span>
-                                            {% endif %}
-                                            {% if plot_point.organizations.all %}
-                                                <span class="relation-tag">Organizations: {{ plot_point.organizations.all|join:", " }}</span>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="plotpoint-actions">
-                                <div class="reorder-buttons">
-                                    <button type="button" class="btn btn-small btn-reorder" onclick="reorderPlotPoint({{ plot_point.id }}, 'up')" {% if forloop.first %}disabled{% endif %}>↑</button>
-                                    <button type="button" class="btn btn-small btn-reorder" onclick="reorderPlotPoint({{ plot_point.id }}, 'down')" {% if forloop.last %}disabled{% endif %}>↓</button>
-                                </div>
-                                <a href="{% url 'plotpoint_edit' project.id plot_point.id %}" class="btn btn-small">Edit</a>
-                                <a href="{% url 'plotpoint_delete' project.id plot_point.id %}" class="btn btn-small btn-danger">Delete</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="no-characters">No plot points created yet. <a href="{% url 'plotpoint_create' project.id %}">Add your first plot point</a>!</p>
-            {% endif %}
-        </div>
 
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <h2>Research Notes</h2>
-                    <a href="{% url 'researchnote_list' project.id %}" class="view-all-link">View All Research Notes</a>
-                </div>
-                <a href="{% url 'researchnote_create' project.id %}" class="btn btn-small">Add Research Note</a>
+
+            <div class="form-section">
+                {% include "core/_includes/section_header.html" with section_title="Places" view_all_url_name='place_list' add_url_name='place_create' project_id=project.id %}
+                {% if project.places.all %}
+                    <div class="items-grid">
+                        {% for place in project.places.all %}
+                            {% include "core/_includes/item_card.html" with item=place item_type='place' project_id=project.id edit_url_name='place_edit' delete_url_name='place_delete' %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="no-items">No places created yet. <a href="{% url 'place_create' project.id %}">Add your first place</a>!</p>
+                {% endif %}
             </div>
-            {% if project.research_notes.all %}
-                <div class="research-notes-grid">
-                    {% for note in project.research_notes.all %}
-                        <div class="research-note-card">
-                            <h3>{{ note.title }}</h3>
-                            <div class="note-content">
-                                <p>{{ note.content|truncatewords:30 }}</p>
-                                {% if note.tags %}
-                                    <div class="note-tags">
-                                        {% for tag in note.tags.split %}
-                                            <span class="tag">{{ tag }}</span>
-                                        {% endfor %}
+
+            <div class="form-section">
+                {% include "core/_includes/section_header.html" with section_title="Organizations" view_all_url_name='organization_list' add_url_name='organization_create' project_id=project.id %}
+                {% if project.organizations.all %}
+                    <div class="items-grid">
+                        {% for organization in project.organizations.all %}
+                            {% include "core/_includes/item_card.html" with item=organization item_type='organization' project_id=project.id edit_url_name='organization_edit' delete_url_name='organization_delete' %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="type">No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
+                {% endif %}
+            </div>
+
+
+            <div class="form-section">
+                {% include "core/_includes/section_header.html" with section_title="Plot points" view_all_url_name='plotpoint_list' add_url_name='plotpoint_create' project_id=project.id %}
+                {% if project.plot_points.all %}
+                    <div class="plotpoints-list">
+                        {% for plot_point in project.plot_points.all %}
+                            <div class="plotpoint-item" data-id="{{ plot_point.id }}">
+                                <div class="plotpoint-content">
+                                    <div class="plotpoint-header">
+                                        <span class="plotpoint-order">{{ plot_point.order }}.</span>
+                                        <span class="plotpoint-title">{{ plot_point.title }}</span>
                                     </div>
-                                {% endif %}
-                                {% if note.file %}
-                                    <div class="note-file">
-                                        <a href="{{ note.file.url }}" target="_blank" class="file-link">
-                                            <i class="fas fa-file"></i> {{ note.file.name }}
-                                        </a>
+                                    <div class="plotpoint-details">
+                                        <p>{{ plot_point.description|truncatewords:15 }}</p>
+                                        {% if plot_point.characters.all or plot_point.places.all or plot_point.organizations.all %}
+                                            <div class="plotpoint-relations">
+                                                {% if plot_point.characters.all %}
+                                                    <span class="relation-tag">Characters: {{ plot_point.characters.all|join:", " }}</span>
+                                                {% endif %}
+                                                {% if plot_point.places.all %}
+                                                    <span class="relation-tag">Places: {{ plot_point.places.all|join:", " }}</span>
+                                                {% endif %}
+                                                {% if plot_point.organizations.all %}
+                                                    <span class="relation-tag">Organizations: {{ plot_point.organizations.all|join:", " }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
+                                </div>
+                                <div class="plotpoint-actions">
+                                    <div class="reorder-buttons">
+                                        <button type="button" class="btn btn-reorder" onclick="reorderPlotPoint({{ plot_point.id }}, 'up')" {% if forloop.first %}disabled{% endif %}>↑</button>
+                                        <button type="button" class="btn btn-reorder" onclick="reorderPlotPoint({{ plot_point.id }}, 'down')" {% if forloop.last %}disabled{% endif %}>↓</button>
+                                    </div>
+                                    <a href="{% url 'plotpoint_edit' project.id plot_point.id %}" class="btn">Edit</a>
+                                    <a href="{% url 'plotpoint_delete' project.id plot_point.id %}" class="btn">Delete</a>
+                                </div>
                             </div>
-                            <div class="note-meta">
-                                <small>Last updated: {{ note.updated_at|date:"M d, Y" }}</small>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="type">No plot points created yet. <a href="{% url 'plotpoint_create' project.id %}">Add your first plot point</a>!</p>
+                {% endif %}
+            </div>
+    
+            <div class="form-section">
+                {% include "core/_includes/section_header.html" with section_title="Research Notes" view_all_url_name='researchnote_list' add_url_name='researchnote_create' project_id=project.id %}
+                {% if project.research_notes.all %}
+                    <div class="plotpoints-list">
+                        {% for note in project.research_notes.all %}
+                            <div class="plotpoint-item">
+                                <div class="plotpoint-content">
+                                    <div class="plotpoint-header">
+                                        <span class="plotpoint-title">{{ note.title }}</span>
+                                    </div>    
+                                    <div class="plotpoint-details">
+                                        <p>{{ note.content|truncatewords:30 }}</p>
+                                        {% if note.tags %}
+                                            <div class="note-tags">
+                                                {% for tag in note.tags.split %}
+                                                    <span class="relation-tag">{{ tag }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        {% if note.file %}
+                                            <div class="type">
+                                                <a href="{{ note.file.url }}" target="_blank" class="file-link">
+                                                    <i class="fas fa-file"></i> {{ note.file.name }}
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="button-group">
+                                        <a href="{% url 'researchnote_edit' project.id note.id %}" class="btn">Edit</a>
+                                        <a href="{% url 'researchnote_delete' project.id note.id %}" class="btn">Delete</a>
+                                    </div>
+                                </div>    
                             </div>
-                            <div class="note-actions">
-                                <a href="{% url 'researchnote_edit' project.id note.id %}" class="btn btn-small">Edit</a>
-                                <a href="{% url 'researchnote_delete' project.id note.id %}" class="btn btn-small btn-danger">Delete</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="no-notes">No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first research note</a>!</p>
-            {% endif %}
-        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="type">No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first research note</a>!</p>
+                {% endif %}
+            </div>
+
         {% endif %}
 
-        <div class="form-actions">
-            <button type="submit" class="btn">Save Project</button>
-            <a href="{% url 'project_list' %}" class="btn btn-secondary">Back to Projects</a>
+
+        <div class="button-group">
+            <button type="submit" class="btn">{{ action }}</button>
+            <a href="{% url 'project_list' %}" class="btn">Back to Projects</a>
         </div>
     </form>
 </div>
 
-<style>
-    .project-editor {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    .project-form {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 2rem;
-    }
-    .form-section {
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid #eee;
-    }
-    .form-section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    .section-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    .section-title h2 {
-        margin: 0;
-    }
-    .view-all-link {
-        color: #666;
-        text-decoration: none;
-        font-size: 0.9rem;
-    }
-    .view-all-link:hover {
-        color: #333;
-        text-decoration: underline;
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-    }
-    .form-group input,
-    .form-group textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
-    }
-    .form-group textarea {
-        resize: vertical;
-    }
-    .form-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-    .characters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-    .character-card {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 1rem;
-    }
-    .character-card h3 {
-        margin: 0;
-        color: #333;
-        font-size: 1.1rem;
-    }
-    .character-role {
-        color: #666;
-        font-style: italic;
-        margin: 0.25rem 0;
-        font-size: 0.9rem;
-    }
-    .character-bio {
-        margin: 0.5rem 0;
-        font-size: 0.9rem;
-    }
-    .character-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 0.75rem;
-    }
-    .no-characters {
-        color: #666;
-        font-style: italic;
-    }
-    .btn-small {
-        padding: 0.25rem 0.75rem;
-        font-size: 0.9rem;
-    }
-    .plotpoints-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    .plotpoint-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 0.5rem;
-    }
-    .plotpoint-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    .plotpoint-header {
-        display: flex;
-        align-items: baseline;
-        gap: 0.25rem;
-    }
-    .plotpoint-order {
-        font-weight: bold;
-        color: #666;
-        min-width: 1.5rem;
-    }
-    .plotpoint-title {
-        font-weight: bold;
-        color: #333;
-    }
-    .plotpoint-details {
-        font-size: 0.85rem;
-        color: #666;
-    }
-    .plotpoint-details p {
-        margin: 0;
-    }
-    .plotpoint-relations {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-        margin-top: 0.25rem;
-    }
-    .relation-tag {
-        background: #e9ecef;
-        padding: 0.15rem 0.35rem;
-        border-radius: 3px;
-        font-size: 0.75rem;
-    }
-    .plotpoint-actions {
-        display: flex;
-        gap: 0.25rem;
-        align-items: center;
-        margin-left: 0.5rem;
-    }
-    .reorder-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 0.1rem;
-    }
-    .btn-reorder {
-        padding: 0.15rem 0.35rem;
-        font-size: 0.62rem;
-        line-height: 1;
-    }
-    .btn-reorder:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    .research-notes-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-    .research-note-card {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 1rem;
-    }
-    .research-note-card h3 {
-        margin: 0;
-        color: #333;
-        font-size: 1.1rem;
-    }
-    .note-content {
-        margin: 0.5rem 0;
-        font-size: 0.9rem;
-    }
-    .note-tags {
-        margin-top: 0.25rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-    }
-    .tag {
-        background: #e9ecef;
-        padding: 0.15rem 0.35rem;
-        border-radius: 3px;
-        font-size: 0.75rem;
-    }
-    .note-file {
-        margin-top: 0.25rem;
-        font-size: 0.85rem;
-        color: #666;
-    }
-    .file-link {
-        color: #666;
-        text-decoration: none;
-    }
-    .note-meta {
-        margin-top: 0.25rem;
-        font-size: 0.75rem;
-        color: #666;
-    }
-    .note-actions {
-        margin-top: 0.75rem;
-        display: flex;
-        gap: 0.5rem;
-    }
-    .no-notes {
-        color: #666;
-        font-style: italic;
-    }
-</style>
 
-<script>
+{% comment %} <script>
 function reorderPlotPoint(plotpointId, direction) {
     const csrfToken = '{{ csrf_token }}';
     
@@ -476,5 +187,5 @@ function reorderPlotPoint(plotpointId, direction) {
         }
     });
 }
-</script>
+</script> {% endcomment %}
 {% endblock %} 

@@ -1,0 +1,44 @@
+{% comment %}
+Expects:
+- item: The object (character, place, organization)
+- item_type: A string like 'character', 'place', 'organization' to adjust specific fields/links
+- project_id: The current project's ID
+- edit_url_name: The name of the edit URL (e.g., 'character_edit')
+- delete_url_name: The name of the delete URL (e.g., 'character_delete')
+{% endcomment %}
+
+<div class="item-card">
+    <h3>{{ item.name }}</h3>
+
+    {% if item_type == 'character' %}
+        <p class="item-type">{{ item.role }}</p>
+        <div class="item-body">
+            <p>{{ item.bio|truncatewords:20 }}</p>
+        </div>
+
+
+    {% elif item_type == 'place' %}
+        <p class="item-type">{{ item.type }}</p> {# Assuming 'type' is the attribute for place #}
+        <div class="item-body">
+            <p>{{ item.description|truncatewords:20 }}</p>
+            {% if item.characters.all %}
+                <p class="relation-tag">{{ item.characters.all|join:", " }}</p>
+            {% endif %}
+        </div>
+
+
+    {% elif item_type == 'organization' %}
+        <p class="item-type">{{ item.purpose|truncatewords:10 }}</p> {# Purpose should be description #}
+        <div class="item-body">
+            <p>{{ item.notes|truncatewords:20 }}</p>
+            {% if item.characters.all %}
+                <p class="relation-tag">{{ item.characters.all|join:", " }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div>
+        <a href="{% url edit_url_name project_id item.id %}" class="btn">Edit</a>
+        <a href="{% url delete_url_name project_id item.id %}" class="btn">Delete</a>
+    </div>
+</div>

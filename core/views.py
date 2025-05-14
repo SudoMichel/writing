@@ -73,7 +73,7 @@ def project_edit(request, pk):
             messages.error(request, 'Please fill in all fields.')
     return render(request, 'core/project_form.html', {
         'project': project,
-        'action': 'Edit'
+        'action': 'Save'
     })
 
 @login_required

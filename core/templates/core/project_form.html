@@ -1,13 +1,12 @@
 {% extends 'core/base.html' %}
 
-
-
-
 {% block title %}{{ action }} Project{% endblock %}
 
 {% block content %}
 <div class="project-editor">
-    <form method="post" class="project-form" data-csrf-token="{{ csrf_token }}">
+    <form method="post" class="project-form" 
+      data-csrf-token="{{ csrf_token }}"
+      data-project-id="{{ project.id|default:'' }}">
         {% csrf_token %}
         <div class="form-section">
             <h2>Project Details</h2>
@@ -159,8 +158,7 @@
     </form>
 </div>
 
-
-{% comment %} <script>
+<script>
 function reorderPlotPoint(plotpointId, direction) {
     const csrfToken = '{{ csrf_token }}';
     
@@ -187,5 +185,5 @@ function reorderPlotPoint(plotpointId, direction) {
         }
     });
 }
-</script> {% endcomment %}
+</script>
 {% endblock %} 

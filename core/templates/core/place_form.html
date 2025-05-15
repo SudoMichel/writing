@@ -24,7 +24,7 @@
                 <div class="description-container">
                     <textarea id="description" name="description" rows="4" required>{{ place.description|default:'' }}</textarea>
                     {% if place %}
-                    <button type="button" id="improve-description" class="btn btn-ai" onclick="improveDescription()">
+                    <button type="button" id="improve-description" class="btn" onclick="improveDescription()">
                         Improve with AI
                     </button>
                     {% endif %}
@@ -33,105 +33,13 @@
             </div>
         </div>
         
-        <div class="form-actions">
+        <div class="button-group">
             <button type="submit" class="btn">Save Place</button>
             <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
         </div>
     </form>
 </div>
 
-<style>
-    .project-editor {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    .project-form {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 2rem;
-    }
-    .form-section {
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid #eee;
-    }
-    .form-section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-    }
-    .form-group input,
-    .form-group textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
-    }
-    .form-group textarea {
-        resize: vertical;
-    }
-    .form-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-    .btn {
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-    }
-    .btn-secondary {
-        background: #f8f9fa;
-        color: #333;
-        border: 1px solid #ddd;
-    }
-    .btn-secondary:hover {
-        background: #e9ecef;
-    }
-    .description-container {
-        position: relative;
-    }
-    .btn-ai {
-        position: absolute;
-        right: 0.5rem;
-        top: 0.5rem;
-        background: #4a90e2;
-        color: white;
-        border: none;
-        padding: 0.25rem 0.75rem;
-        font-size: 0.9rem;
-    }
-    .btn-ai:hover {
-        background: #357abd;
-    }
-    .improvement-status {
-        margin-top: 0.5rem;
-        font-size: 0.9rem;
-    }
-    .improvement-status.loading {
-        color: #4a90e2;
-    }
-    .improvement-status.error {
-        color: #dc3545;
-    }
-    .improvement-status.success {
-        color: #28a745;
-    }
-</style>
 
 <script>
 async function improveDescription() {

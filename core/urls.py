@@ -25,7 +25,6 @@ urlpatterns = [
     path('projects/<int:project_id>/plotpoints/create/', views.plotpoint_create, name='plotpoint_create'),
     path('projects/<int:project_id>/plotpoints/<int:plotpoint_id>/edit/', views.plotpoint_edit, name='plotpoint_edit'),
     path('projects/<int:project_id>/plotpoints/<int:plotpoint_id>/delete/', views.plotpoint_delete, name='plotpoint_delete'),
-    path('projects/<int:project_id>/plotpoints/reorder/', views.plotpoint_reorder, name='plotpoint_reorder'),
     path('projects/<int:project_id>/researchnotes/', views.researchnote_list, name='researchnote_list'),
     path('projects/<int:project_id>/researchnotes/create/', views.researchnote_create, name='researchnote_create'),
     path('projects/<int:project_id>/researchnotes/<int:note_id>/edit/', views.researchnote_edit, name='researchnote_edit'),

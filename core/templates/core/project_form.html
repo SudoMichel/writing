@@ -59,7 +59,7 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="type">No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
+                    <p class="item-type">No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
                 {% endif %}
             </div>
 
@@ -93,10 +93,6 @@
                                     </div>
                                 </div>
                                 <div class="plotpoint-actions">
-                                    <div class="reorder-buttons">
-                                        <button type="button" class="btn btn-reorder" onclick="reorderPlotPoint({{ plot_point.id }}, 'up')" {% if forloop.first %}disabled{% endif %}>↑</button>
-                                        <button type="button" class="btn btn-reorder" onclick="reorderPlotPoint({{ plot_point.id }}, 'down')" {% if forloop.last %}disabled{% endif %}>↓</button>
-                                    </div>
                                     <a href="{% url 'plotpoint_edit' project.id plot_point.id %}" class="btn">Edit</a>
                                     <a href="{% url 'plotpoint_delete' project.id plot_point.id %}" class="btn">Delete</a>
                                 </div>
@@ -104,7 +100,7 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="type">No plot points created yet. <a href="{% url 'plotpoint_create' project.id %}">Add your first plot point</a>!</p>
+                    <p class="item-type">No plot points created yet. <a href="{% url 'plotpoint_create' project.id %}">Add your first plot point</a>!</p>
                 {% endif %}
             </div>
     
@@ -128,7 +124,7 @@
                                             </div>
                                         {% endif %}
                                         {% if note.file %}
-                                            <div class="type">
+                                            <div class="item-type">
                                                 <a href="{{ note.file.url }}" target="_blank" class="file-link">
                                                     <i class="fas fa-file"></i> {{ note.file.name }}
                                                 </a>
@@ -144,7 +140,7 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="type">No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first research note</a>!</p>
+                    <p class="item-type">No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first research note</a>!</p>
                 {% endif %}
             </div>
 
@@ -157,33 +153,4 @@
         </div>
     </form>
 </div>
-
-<script>
-function reorderPlotPoint(plotpointId, direction) {
-    const csrfToken = '{{ csrf_token }}';
-    
-    fetch("{% url 'plotpoint_reorder' project.id %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': csrfToken
-        },
-        body: `plotpoint_id=${plotpointId}&direction=${direction}`
-    })
-    .then(response => {
-        if (response.ok) {
-            // Reload only the plotpoints section
-            const plotpointsSection = document.querySelector('.plotpoints-list').parentElement;
-            fetch(window.location.href)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newPlotpointsSection = doc.querySelector('.plotpoints-list').parentElement;
-                    plotpointsSection.innerHTML = newPlotpointsSection.innerHTML;
-                });
-        }
-    });
-}
-</script>
 {% endblock %} 

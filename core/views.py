@@ -61,6 +61,16 @@ def project_create(request):
 @login_required
 def project_edit(request, pk):
     project = get_object_or_404(Project, pk=pk, user=request.user)
+    return render(request, 'core/project_form.html', {
+        'project': project,
+        'trunc': 20,
+        'action': 'Save',
+        'editing_project_details': False
+    })
+
+@login_required
+def project_details_edit(request, pk):
+    project = get_object_or_404(Project, pk=pk, user=request.user)
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description')
@@ -74,8 +84,8 @@ def project_edit(request, pk):
             messages.error(request, 'Please fill in all fields.')
     return render(request, 'core/project_form.html', {
         'project': project,
-        'trunc': 20,
-        'action': 'Save'
+        'action': 'Save',
+        'editing_project_details': True
     })
 
 @login_required
@@ -470,8 +480,6 @@ def plotpoint_edit(request, project_id, plotpoint_id):
                     plot_point.chapter = chapter
                 except Chapter.DoesNotExist:
                     plot_point.chapter = None
-            else:
-                plot_point.chapter = None
                 
             plot_point.save()
             
@@ -692,7 +700,6 @@ def chapter_edit(request, project_id, chapter_id):
             chapter.chapter_number = chapter_number
             chapter.content = content
             
-            # Set point of view if specified
             if point_of_view_id:
                 try:
                     character = Character.objects.get(id=point_of_view_id, project=project)

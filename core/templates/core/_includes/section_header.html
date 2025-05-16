@@ -6,6 +6,6 @@
         {% if view_all_url_name %}
             <a href="{% url view_all_url_name project.id %}" class="btn">View All {{ section_title }}</a>
         {% endif %}
-        <a href="{% url add_url_name project.id %}" class="btn btn-small">Add {{ section_title|slice:":-1" }}</a> {# Slicing 's' for singular add #}
+        <a href="{% url add_url_name project.id %}" class="btn">Add {{ section_title|slice:":-1" }}</a> {# Slicing 's' for singular add #}
     </div>
 </div>

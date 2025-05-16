@@ -1,7 +1,8 @@
 {% extends 'core/base.html' %}
 
-{% block content %}
+{% block title %}Organizations - {{ project.name }}{% endblock %}
 
+{% block content %}
 <div class="section-header">
     <h2>Organizations in {{ project.name }}</h2>
     <a href="{% url 'organization_create' project.id %}" class="btn">Create Organization</a>
@@ -10,41 +11,14 @@
 {% if organizations %}
     <div class="items-grid">
         {% for organization in organizations %}
-            <div class="item-card">
-                        <h3>{{ organization.name }}</h3>
-                        <p class="item-type">{{ organization.purpose }}</p>
-                        {% if organization.notes %}
-                            <p class="item-body">{{ organization.notes }}</p>
-                        {% endif %}
-                        
-                        <h6 class="mt-3">Members:</h6>
-                        {% if organization.characters.all %}
-                            <ul class="list-unstyled">
-                                {% for character in organization.characters.all %}
-                                    <li>{{ character.name }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p class="text-muted">No members yet</p>
-                        {% endif %}
-                        
-                        <div class="mt-3">
-                            <a href="{% url 'organization_edit' project.id organization.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                            <a href="{% url 'organization_delete' project.id organization.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include "core/_includes/item_card.html" with item=organization item_type='organization' project_id=project.id edit_url_name='organization_edit' delete_url_name='organization_delete' %}
         {% endfor %}
     </div>
 {% else %}
-    <div class="alert alert-info">
-        No organizations have been created yet. Click the "Create Organization" button to add one.
-    </div>
+    <p>No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
 {% endif %}
 
-<div class="mt-4">
+<div class="button-group">
     <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
 </div>
-
 {% endblock %} 

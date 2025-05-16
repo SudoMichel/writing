@@ -186,7 +186,8 @@ def improve_character_bio(request, project_id, character_id):
         # Create the prompt
         prompt = f"""Please improve and expand the bio for the character "{character.name}" in this writing project. 
 Consider their role, traits, relationships, and involvement in plot points to create a more detailed and engaging character bio.
-The bio should be consistent with the existing project context and maintain the character's established personality and relationships. It should be plain text and have a literary quality
+The bio should be consistent with the existing project context and maintain the character's established personality and relationships. 
+It should be plain text and have a literary quality. Don't add any comments or explanation.
 
 Current character bio:
 {character.bio}

@@ -11,17 +11,7 @@
 {% if places %}
     <div class="items-grid">
         {% for place in places %}
-            <div class="item-card">
-                <h3>{{ place.name }}</h3>
-                <p class="item-type">{{ place.type }}</p>
-                <div class="item-body">
-                    <p>{{ place.description|truncatewords:30 }}</p>
-                </div>
-                <div class="button-group">
-                    <a href="{% url 'place_edit' project.id place.id %}" class="btn btn-small">Edit</a>
-                    <a href="{% url 'place_delete' project.id place.id %}" class="btn btn-small btn-danger">Delete</a>
-                </div>
-            </div>
+            {% include "core/_includes/item_card.html" with item=place item_type='place' project_id=project.id edit_url_name='place_edit' delete_url_name='place_delete' %}
         {% endfor %}
     </div>
 {% else %}

@@ -26,7 +26,6 @@ a {
     font-size: 0.8rem;
 }
 .item-body {
-    margin: 0.5rem 0;
     font-size: 0.9rem;
 }
 .items-grid {
@@ -37,8 +36,10 @@ a {
 .item-card {
     background: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 .item-card textarea {
     width: 90%;
@@ -107,7 +108,11 @@ a {
     gap: 0.5rem;
     margin-top: 0.75rem;
 }
-
+.button-card {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+}
 
 .project-editor {
     max-width: 1200px;
@@ -121,7 +126,7 @@ a {
     padding: 2rem;
 }
 .form-section {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     padding-bottom: 2rem;
     border-bottom: 1px solid #eee;
 }
@@ -146,7 +151,7 @@ a {
 .plotpoints-list {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 1rem;
 }
 .plotpoint-item {
     display: flex;
@@ -154,14 +159,13 @@ a {
     align-items: flex-start;
     background: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 0.5rem;
+    border-radius: 8px;
+    padding: 1rem;
 }
 .plotpoint-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
 }
 .plotpoint-header {
     display: flex;
@@ -198,8 +202,8 @@ a {
 }
 .plotpoint-actions {
     display: flex;
-    gap: 0.25rem;
-    align-items: center;
+    gap: 0.5rem;
+    align-items: flex-end;
     margin-left: 0.5rem;
 }
 

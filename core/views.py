@@ -73,7 +73,7 @@ def project_edit(request, pk):
             messages.error(request, 'Please fill in all fields.')
     return render(request, 'core/project_form.html', {
         'project': project,
-        'trunc:':40,
+        'trunc':20,
         'action': 'Save'
     })
 
@@ -92,7 +92,8 @@ def character_list(request, project_id):
     characters = project.characters.all()
     return render(request, 'core/character_list.html', {
         'project': project,
-        'characters': characters
+        'characters': characters,
+        'trunc':70,
     })
 
 @login_required
@@ -204,7 +205,8 @@ def place_list(request, project_id):
     places = project.places.all()
     return render(request, 'core/place_list.html', {
         'project': project,
-        'places': places
+        'places': places,
+        'trunc':70,
     })
 
 @login_required
@@ -262,7 +264,8 @@ def organization_list(request, project_id):
     organizations = project.organizations.all()
     return render(request, 'core/organization_list.html', {
         'project': project,
-        'organizations': organizations
+        'organizations': organizations,
+        'trunc':70,
     })
 
 @login_required
@@ -351,7 +354,7 @@ def plotpoint_list(request, project_id):
     plot_points = project.plot_points.all()
     return render(request, 'core/plotpoint_list.html', {
         'project': project,
-        'plot_points': plot_points
+        'plot_points': plot_points,
     })
 
 @login_required
@@ -453,32 +456,6 @@ def plotpoint_delete(request, project_id, plotpoint_id):
         'project': project,
         'plot_point': plot_point
     })
-
-@login_required
-def plotpoint_reorder(request, project_id):
-    project = get_object_or_404(Project, pk=project_id, user=request.user)
-    if request.method == 'POST':
-        plotpoint_id = request.POST.get('plotpoint_id')
-        direction = request.POST.get('direction')
-        
-        plotpoint = get_object_or_404(PlotPoint, pk=plotpoint_id, project=project)
-        plotpoints = list(project.plot_points.all().order_by('order'))
-        current_index = plotpoints.index(plotpoint)
-        
-        if direction == 'up' and current_index > 0:
-            # Swap with previous plotpoint
-            plotpoints[current_index].order, plotpoints[current_index - 1].order = plotpoints[current_index - 1].order, plotpoints[current_index].order
-            plotpoints[current_index].save()
-            plotpoints[current_index - 1].save()
-        elif direction == 'down' and current_index < len(plotpoints) - 1:
-            # Swap with next plotpoint
-            plotpoints[current_index].order, plotpoints[current_index + 1].order = plotpoints[current_index + 1].order, plotpoints[current_index].order
-            plotpoints[current_index].save()
-            plotpoints[current_index + 1].save()
-            
-        return redirect('project_edit', pk=project.id)
-    
-    return redirect('project_edit', pk=project.id)
 
 @login_required
 def researchnote_create(request, project_id):

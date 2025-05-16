@@ -23,129 +23,136 @@
         {% if project %}
             
             <div class="form-section">
-                {% include "core/_includes/section_header.html" with section_title="Characters" view_all_url_name='character_list' add_url_name='character_create' project_id=project.id %}
+                {% include "core/_includes/section_header.html" 
+                    with 
+                        section_title="Characters" 
+                        view_all_url_name='character_list' 
+                        add_url_name='character_create' 
+                        project_id=project.id 
+                %}
                 {% if project.characters.all %}
                     <div class="items-grid">
                     {% for character in project.characters.all %}
-                        {% include "core/_includes/item_card.html" with item=character item_type='character' project_id=project.id edit_url_name='character_edit' delete_url_name='character_delete' %}
+                        {% include "core/_includes/item_card.html" 
+                            with 
+                                item=character 
+                                item_type='character' 
+                                project_id=project.id 
+                                edit_url_name='character_edit' 
+                                delete_url_name='character_delete' 
+                        %}
                     {% endfor %}
                     </div>
                 {% else %}
-                    <p class="no-items">No characters created yet. <a href="{% url 'character_create' project.id %}">Add your first character</a>!</p> {# Generic class name #}
+                    <p>No characters created yet. <a href="{% url 'character_create' project.id %}">Add your first character</a>!</p>
                 {% endif %}
             </div> 
 
-
-
             <div class="form-section">
-                {% include "core/_includes/section_header.html" with section_title="Places" view_all_url_name='place_list' add_url_name='place_create' project_id=project.id %}
+                {% include "core/_includes/section_header.html" 
+                    with 
+                        section_title="Places" 
+                        view_all_url_name='place_list' 
+                        add_url_name='place_create' 
+                        project_id=project.id 
+                %}
                 {% if project.places.all %}
                     <div class="items-grid">
                         {% for place in project.places.all %}
-                            {% include "core/_includes/item_card.html" with item=place item_type='place' project_id=project.id edit_url_name='place_edit' delete_url_name='place_delete' %}
+                            {% include "core/_includes/item_card.html" 
+                                with 
+                                    item=place 
+                                    item_type='place' 
+                                    project_id=project.id 
+                                    edit_url_name='place_edit' 
+                                    delete_url_name='place_delete' 
+                            %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="no-items">No places created yet. <a href="{% url 'place_create' project.id %}">Add your first place</a>!</p>
+                    <p>No places created yet. <a href="{% url 'place_create' project.id %}">Add your first place</a>!</p>
                 {% endif %}
             </div>
 
             <div class="form-section">
-                {% include "core/_includes/section_header.html" with section_title="Organizations" view_all_url_name='organization_list' add_url_name='organization_create' project_id=project.id %}
+                {% include "core/_includes/section_header.html" 
+                    with 
+                        section_title="Organizations" 
+                        view_all_url_name='organization_list' 
+                        add_url_name='organization_create' 
+                        project_id=project.id 
+                %}
                 {% if project.organizations.all %}
                     <div class="items-grid">
                         {% for organization in project.organizations.all %}
-                            {% include "core/_includes/item_card.html" with item=organization item_type='organization' project_id=project.id edit_url_name='organization_edit' delete_url_name='organization_delete' %}
+                            {% include "core/_includes/item_card.html" 
+                                with 
+                                    item=organization 
+                                    item_type='organization' 
+                                    project_id=project.id 
+                                    edit_url_name='organization_edit' 
+                                    delete_url_name='organization_delete' 
+                            %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="item-type">No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
+                    <p>No organizations created yet. <a href="{% url 'organization_create' project.id %}">Add your first organization</a>!</p>
                 {% endif %}
             </div>
 
-
             <div class="form-section">
-                {% include "core/_includes/section_header.html" with section_title="Plot points" view_all_url_name='plotpoint_list' add_url_name='plotpoint_create' project_id=project.id %}
+                {% include "core/_includes/section_header.html" 
+                    with 
+                        section_title="Plot Points" 
+                        view_all_url_name='plotpoint_list' 
+                        add_url_name='plotpoint_create' 
+                        project_id=project.id 
+                %}
                 {% if project.plot_points.all %}
                     <div class="plotpoints-list">
                         {% for plot_point in project.plot_points.all %}
-                            <div class="plotpoint-item" data-id="{{ plot_point.id }}">
-                                <div class="plotpoint-content">
-                                    <div class="plotpoint-header">
-                                        <span class="plotpoint-order">{{ plot_point.order }}.</span>
-                                        <span class="plotpoint-title">{{ plot_point.title }}</span>
-                                    </div>
-                                    <div class="plotpoint-details">
-                                        <p>{{ plot_point.description|truncatewords:15 }}</p>
-                                        {% if plot_point.characters.all or plot_point.places.all or plot_point.organizations.all %}
-                                            <div class="plotpoint-relations">
-                                                {% if plot_point.characters.all %}
-                                                    <span class="relation-tag">Characters: {{ plot_point.characters.all|join:", " }}</span>
-                                                {% endif %}
-                                                {% if plot_point.places.all %}
-                                                    <span class="relation-tag">Places: {{ plot_point.places.all|join:", " }}</span>
-                                                {% endif %}
-                                                {% if plot_point.organizations.all %}
-                                                    <span class="relation-tag">Organizations: {{ plot_point.organizations.all|join:", " }}</span>
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="plotpoint-actions">
-                                    <a href="{% url 'plotpoint_edit' project.id plot_point.id %}" class="btn">Edit</a>
-                                    <a href="{% url 'plotpoint_delete' project.id plot_point.id %}" class="btn">Delete</a>
-                                </div>
-                            </div>
+                            {% include "core/_includes/item_list.html" 
+                                with 
+                                    item=plot_point 
+                                    item_type='plot_point' 
+                                    project_id=project.id 
+                                    edit_url_name='plotpoint_edit' 
+                                    delete_url_name='plotpoint_delete' 
+                            %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="item-type">No plot points created yet. <a href="{% url 'plotpoint_create' project.id %}">Add your first plot point</a>!</p>
+                    <p>No plot points created yet. <a href="{% url 'plotpoint_create' project.id %}">Add your first plot point</a>!</p>
                 {% endif %}
             </div>
-    
+
             <div class="form-section">
-                {% include "core/_includes/section_header.html" with section_title="Research Notes" view_all_url_name='researchnote_list' add_url_name='researchnote_create' project_id=project.id %}
+                {% include "core/_includes/section_header.html" 
+                    with 
+                        section_title="Research Notes" 
+                        view_all_url_name='researchnote_list' 
+                        add_url_name='researchnote_create' 
+                        project_id=project.id 
+                %}
                 {% if project.research_notes.all %}
                     <div class="plotpoints-list">
-                        {% for note in project.research_notes.all %}
-                            <div class="plotpoint-item">
-                                <div class="plotpoint-content">
-                                    <div class="plotpoint-header">
-                                        <span class="plotpoint-title">{{ note.title }}</span>
-                                    </div>    
-                                    <div class="plotpoint-details">
-                                        <p>{{ note.content|truncatewords:30 }}</p>
-                                        {% if note.tags %}
-                                            <div class="note-tags">
-                                                {% for tag in note.tags.split %}
-                                                    <span class="relation-tag">{{ tag }}</span>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        {% if note.file %}
-                                            <div class="item-type">
-                                                <a href="{{ note.file.url }}" target="_blank" class="file-link">
-                                                    <i class="fas fa-file"></i> {{ note.file.name }}
-                                                </a>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="button-group">
-                                        <a href="{% url 'researchnote_edit' project.id note.id %}" class="btn">Edit</a>
-                                        <a href="{% url 'researchnote_delete' project.id note.id %}" class="btn">Delete</a>
-                                    </div>
-                                </div>    
-                            </div>
+                        {% for research_note in project.research_notes.all %}
+                            {% include "core/_includes/item_list.html" 
+                                with 
+                                    item=research_note 
+                                    item_type='research_note' 
+                                    project_id=project.id 
+                                    edit_url_name='researchnote_edit' 
+                                    delete_url_name='researchnote_delete' 
+                            %}
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="item-type">No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first research note</a>!</p>
+                    <p>No research notes created yet. <a href="{% url 'researchnote_create' project.id %}">Add your first researh note</a>!</p>
                 {% endif %}
             </div>
 
         {% endif %}
-
 
         <div class="button-group">
             <button type="submit" class="btn">{{ action }}</button>

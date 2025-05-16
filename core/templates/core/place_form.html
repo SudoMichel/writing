@@ -33,6 +33,21 @@
             </div>
         </div>
         
+        <div class="form-section">
+            <h2>Characters</h2>
+            <div class="items-grid">
+                {% for character in characters %}
+                    <div class="item-card">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
+                                {% if place and character in place.characters.all %}checked{% endif %}>
+                            <span>{{ character.name }}</span>
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
         <div class="button-group">
             <button type="submit" class="btn">Save Place</button>
             <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>

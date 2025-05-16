@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Confirm Delete Chapter - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="confirm-delete">
+    <h2>Confirm Delete</h2>
+    <p>Are you sure you want to delete the chapter "{{ chapter.title }}"?</p>
+    
+    {% if chapter.plot_points.all %}
+    <div class="alert alert-warning">
+        <p><strong>Warning:</strong> This chapter has {{ chapter.plot_points.count }} plot points associated with it. 
+        Deleting this chapter will remove its association with these plot points.</p>
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

@@ -21,9 +21,9 @@
             </div>
             
             <div class="form-group">
-                <label for="bio">Bio *</label>
+                <label for="description">Description *</label>
                 <div class="bio-container">
-                    <textarea id="bio" name="bio" rows="4" required>{{ character.bio|default:'' }}</textarea>
+                    <textarea id="description" name="description" rows="4" required>{{ character.description|default:'' }}</textarea>
                     {% if character %}
                     <button type="button" id="improve-bio" class="btn" data-project-id="{{ project.id }}" data-character-id="{{ character.id }}">
                         Improve with AI

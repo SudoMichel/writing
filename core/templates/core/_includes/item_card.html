@@ -6,7 +6,7 @@
     {% if item_type == 'character' %}
         <p class="item-type">{{ item.role }}</p>
         <div class="item-body">
-            <p>{{ item.bio|truncatewords_var:trunc }}</p>
+            <p>{{ item.description|truncatewords_var:trunc }}</p>
         </div>
 
 
@@ -21,9 +21,9 @@
 
 
     {% elif item_type == 'organization' %}
-        <p class="item-type">{{ item.purpose }}</p> {# Purpose should be description #}
+        <p class="item-type">{{ item.type }}</p>
         <div class="item-body">
-            <p>{{ item.notes|truncatewords_var:trunc }}</p>
+            <p>{{ item.description|truncatewords_var:trunc }}</p>
             {% if item.characters.all %}
                 <p class="relation-tag">{{ item.characters.all|join:", " }}</p>
             {% endif %}

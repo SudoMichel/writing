@@ -16,7 +16,7 @@ class Project(models.Model):
 class Character(models.Model):
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=100)
-    bio = models.TextField()
+    description = models.TextField()
     traits = models.TextField(help_text="Enter character traits, separated by commas")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='characters')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,6 +44,7 @@ class Place(models.Model):
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=100)
     description = models.TextField()
+    characters = models.ManyToManyField(Character, related_name='places', blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='places')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -55,9 +56,10 @@ class Place(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=200)
-    purpose = models.TextField()
-    notes = models.TextField(blank=True)
+    type = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
     characters = models.ManyToManyField(Character, related_name='organizations', blank=True)
+    places = models.ManyToManyField(Place, related_name='organizations', blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='organizations')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -67,6 +69,23 @@ class Organization(models.Model):
     class Meta:
         ordering = ['name']
 
+class Chapter(models.Model):
+    title = models.CharField(max_length=200)
+    chapter_number = models.IntegerField(default=1)
+    content = models.TextField(blank=True)
+    point_of_view = models.ForeignKey(Character, on_delete=models.SET_NULL, related_name='pov_chapters', null=True, blank=True)
+    characters = models.ManyToManyField(Character, related_name='chapters', blank=True)
+    places = models.ManyToManyField(Place, related_name='chapters', blank=True)
+    organizations = models.ManyToManyField(Organization, related_name='chapters', blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='chapters')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chapter {self.chapter_number}: {self.title}"
+
+    class Meta:
+        ordering = ['chapter_number', 'created_at']
+
 class PlotPoint(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -74,6 +93,7 @@ class PlotPoint(models.Model):
     characters = models.ManyToManyField(Character, related_name='plot_points', blank=True)
     places = models.ManyToManyField(Place, related_name='plot_points', blank=True)
     organizations = models.ManyToManyField(Organization, related_name='plot_points', blank=True)
+    chapter = models.ForeignKey(Chapter, on_delete=models.SET_NULL, related_name='plot_points', null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='plot_points')
     created_at = models.DateTimeField(auto_now_add=True)
 

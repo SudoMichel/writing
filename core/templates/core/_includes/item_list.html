@@ -39,6 +39,30 @@
                     </div>
                 {% endif %}
             </div>
+        {% elif item_type == 'chapter' %}
+            <div class="item-body">
+                <div class="item-meta">
+                    <span class="chapter-number">Chapter {{ item.chapter_number }}</span>
+                </div>
+                <p>{{ item.content|truncatewords_var:trunc }}</p>
+                <div class="item-relations">
+                    {% if item.point_of_view %}
+                        <span class="relation-tag">POV: {{ item.point_of_view.name }}</span>
+                    {% endif %}
+                    {% if item.plot_points.count > 0 %}
+                        <span class="relation-tag">Plot Points: {{ item.plot_points.count }}</span>
+                    {% endif %}
+                    {% if item.characters.all %}
+                        <span class="relation-tag">Characters: {{ item.characters.all|join:", " }}</span>
+                    {% endif %}
+                    {% if item.places.all %}
+                        <span class="relation-tag">Places: {{ item.places.all|join:", " }}</span>
+                    {% endif %}
+                    {% if item.organizations.all %}
+                        <span class="relation-tag">Organizations: {{ item.organizations.all|join:", " }}</span>
+                    {% endif %}
+                </div>
+            </div>
         {% endif %}
     </div>
     <div class="item-actions">

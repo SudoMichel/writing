@@ -29,4 +29,8 @@ urlpatterns = [
     path('projects/<int:project_id>/researchnotes/create/', views.researchnote_create, name='researchnote_create'),
     path('projects/<int:project_id>/researchnotes/<int:note_id>/edit/', views.researchnote_edit, name='researchnote_edit'),
     path('projects/<int:project_id>/researchnotes/<int:note_id>/delete/', views.researchnote_delete, name='researchnote_delete'),
+    path('projects/<int:project_id>/chapters/', views.chapter_list, name='chapter_list'),
+    path('projects/<int:project_id>/chapters/create/', views.chapter_create, name='chapter_create'),
+    path('projects/<int:project_id>/chapters/<int:chapter_id>/edit/', views.chapter_edit, name='chapter_edit'),
+    path('projects/<int:project_id>/chapters/<int:chapter_id>/delete/', views.chapter_delete, name='chapter_delete'),
 ] 

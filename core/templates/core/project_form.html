@@ -75,6 +75,19 @@
             </div>
 
             <div class="form-section">
+                {% include "core/_includes/section_header.html" with section_title="Chapters" view_all_url_name='chapter_list' add_url_name='chapter_create' project_id=project.id %}
+                {% if project.chapters.all %}
+                    <div class="items-list">
+                        {% for chapter in project.chapters.all %}
+                            {% include "core/_includes/item_list.html" with item=chapter item_type='chapter' project_id=project.id edit_url_name='chapter_edit' delete_url_name='chapter_delete' %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No chapters created yet. <a href="{% url 'chapter_create' project.id %}">Add your first chapter</a>!</p>
+                {% endif %}
+            </div>
+
+            <div class="form-section">
                 {% include "core/_includes/section_header.html" with section_title="Research Notes" view_all_url_name='researchnote_list' add_url_name='researchnote_create' project_id=project.id %}
                 {% if project.research_notes.all %}
                     <div class="items-list">

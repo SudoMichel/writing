@@ -24,7 +24,7 @@ def get_project_context(project):
         char_data = {
             'name': character.name,
             'role': character.role,
-            'bio': character.bio,
+            'description': character.description,
             'traits': character.traits,
             'relationships': []
         }
@@ -55,16 +55,18 @@ def get_project_context(project):
         context_data['project']['places'].append({
             'name': place.name,
             'type': place.type,
-            'description': place.description
+            'description': place.description,
+            'characters': [char.name for char in place.characters.all()]
         })
     
     # Add organizations
     for org in project.organizations.all():
         org_data = {
             'name': org.name,
-            'purpose': org.purpose,
-            'notes': org.notes,
-            'characters': [char.name for char in org.characters.all()]
+            'type': org.type,
+            'description': org.description,
+            'characters': [char.name for char in org.characters.all()],
+            'places': [place.name for place in org.places.all()]
         }
         context_data['project']['organizations'].append(org_data)
     
@@ -189,8 +191,8 @@ Consider their role, traits, relationships, and involvement in plot points to cr
 The bio should be consistent with the existing project context and maintain the character's established personality and relationships. 
 It should be plain text and have a literary quality. Don't add any comments or explanation.
 
-Current character bio:
-{character.bio}
+Current character description:
+{character.description}
 
 Here is the full project context:
 {llm_context}
@@ -298,21 +300,21 @@ def improve_organization_description(request, project_id, organization_id):
         
         # Create the prompt
         prompt = f"""Please improve and expand the description for the organization "{organization.name}" in this writing project. 
-Consider its purpose, members, and role in the story to create a more detailed and engaging organization description.
+Consider its type, members, and role in the story to create a more detailed and engaging organization description.
 The description should be consistent with the existing project context and maintain the organization's established characteristics and significance.
 It should be plain text, not json and it should have a literary quality. Very aestetic language. Don't add any comments or explanation.
 
-Current organization purpose:
-{organization.purpose}
+Current organization type:
+{organization.type}
 
-Current organization notes:
-{organization.notes}
+Current organization description:
+{organization.description}
 
 Here is the full project context:
 {llm_context}
 
 Please provide an improved version of the organization's description that:
-1. Expands on its purpose and goals
+1. Expands on its type and goals
 2. Incorporates its relationships with characters and other organizations
 3. References its involvement in key plot points
 4. Maintains consistency with its established role and influence

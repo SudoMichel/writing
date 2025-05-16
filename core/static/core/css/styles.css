@@ -40,6 +40,13 @@ a {
     border-radius: 6px;
     padding: 1rem;
 }
+.item-card textarea {
+    width: 90%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
 
 
 .nav {
@@ -227,6 +234,23 @@ a {
     padding: 10px;
     background-color: #ffebee;
 }
+
+
+.delete-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.warning {
+    color: #dc3545;
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
 
 .improvement-status {
     margin-top: 0.5rem;

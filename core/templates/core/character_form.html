@@ -45,12 +45,12 @@
             <h2>Relationships</h2>
             <p class="help-text">Describe this character's relationship with other characters in the project.</p>
             
-            <div class="relationships-grid">
+            <div class="items-grid">
                 {% for other_character in project.characters.all %}
                     {% if other_character.id != character.id %}
-                    <div class="relationship-card">
-                        <label for="relationship_{{ other_character.id }}">
-                            Relationship with {{ other_character.name }}
+                    <div class="item-card">
+                        <label for="{{ other_character.id }}">
+                            {{ other_character.name }}
                         </label>
                         <textarea name="relationship_{{ other_character.id }}" id="relationship_{{ other_character.id }}" rows="2">{{ relationships|get_item:other_character.id|default:'' }}</textarea>
                     </div>
@@ -67,32 +67,6 @@
     </form>
 </div>
 
-<style>
-    .relationships-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    .relationship-card {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 1rem;
-    }
-    .relationship-card label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-    }
-    .relationship-card textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 0.9rem;
-    }
-</style>
 
 <script>
 async function improveBio() {

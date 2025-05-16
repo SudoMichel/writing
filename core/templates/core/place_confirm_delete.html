@@ -1,17 +1,19 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Delete Place - {{ project.name }}{% endblock %}
+{% block title %}Delete Place{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8">
-        <h1 class="text-2xl font-bold mb-4">Delete Place</h1>
-        <p class="mb-6">Are you sure you want to delete the place <span class="font-semibold">{{ place.name }}</span>? This action cannot be undone.</p>
-        <form method="post" class="flex space-x-4">
-            {% csrf_token %}
-            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700">Delete</button>
-            <a href="{% url 'project_edit' project.id %}" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300">Cancel</a>
-        </form>
-    </div>
+<div class="delete-container">
+    <h2>Delete Place</h2>
+    <p>Are you sure you want to delete the place "{{ place.name }}" from "{{ project.name }}"?</p>
+    <p class="warning">This action cannot be undone.</p>
+
+    <form method="post" class="flex space-x-4">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
 </div>
 {% endblock %} 

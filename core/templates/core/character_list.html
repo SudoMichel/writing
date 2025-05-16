@@ -3,32 +3,31 @@
 {% block title %}Characters - {{ project.name }}{% endblock %}
 
 {% block content %}
-<div class="characters-header">
+<div class="section-header">
     <div>
-        <h1>Characters in {{ project.name }}</h1>
-        <p class="project-description">{{ project.description }}</p>
+        <h2>Characters in {{ project.name }}</h2>
     </div>
     <a href="{% url 'character_create' project.id %}" class="btn">Add Character</a>
 </div>
 
 {% if characters %}
-    <div class="characters-grid">
+    <div class="items-grid">
         {% for character in characters %}
-            <div class="character-card">
+            <div class="item-card">
                 <h3>{{ character.name }}</h3>
-                <p class="character-role">{{ character.role }}</p>
-                <div class="character-bio">
+                <p class="item-type">{{ character.role }}</p>
+                <div class="item-body">
                     <p>{{ character.bio|truncatewords:30 }}</p>
                 </div>
                 {% if character.traits %}
-                    <div class="character-traits">
+                    <div class="item-body">
                         <h4>Traits:</h4>
                         <p>{{ character.traits }}</p>
                     </div>
                 {% endif %}
-                <div class="character-actions">
-                    <a href="{% url 'character_edit' project.id character.id %}" class="btn btn-small">Edit</a>
-                    <a href="{% url 'character_delete' project.id character.id %}" class="btn btn-small btn-danger">Delete</a>
+                <div class="button-group">
+                    <a href="{% url 'character_edit' project.id character.id %}" class="btn">Edit</a>
+                    <a href="{% url 'character_delete' project.id character.id %}" class="btn">Delete</a>
                 </div>
             </div>
         {% endfor %}
@@ -37,62 +36,7 @@
     <p>No characters created yet. <a href="{% url 'character_create' project.id %}">Add your first character</a>!</p>
 {% endif %}
 
-<div class="back-link">
-    <a href="{% url 'project_list' %}" class="btn btn-secondary">Back to Projects</a>
+<div class="button-group">
+    <a href="{% url 'project_edit' project.id %}" class="btn btn-secondary">Back to Project</a>
 </div>
-
-<style>
-    .characters-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 2rem;
-    }
-    .project-description {
-        color: #666;
-        margin-top: 0.5rem;
-    }
-    .characters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .character-card {
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .character-card h3 {
-        margin: 0;
-        color: #333;
-    }
-    .character-role {
-        color: #666;
-        font-style: italic;
-        margin: 0.5rem 0;
-    }
-    .character-bio {
-        margin: 1rem 0;
-    }
-    .character-traits {
-        margin: 1rem 0;
-        padding-top: 1rem;
-        border-top: 1px solid #eee;
-    }
-    .character-traits h4 {
-        margin: 0 0 0.5rem 0;
-        color: #666;
-    }
-    .character-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-    .back-link {
-        margin-top: 2rem;
-    }
-</style>
 {% endblock %} 

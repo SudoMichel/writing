@@ -64,7 +64,7 @@
             <div class="form-section">
                 {% include "core/_includes/section_header.html" with section_title="Plot Points" view_all_url_name='plotpoint_list' add_url_name='plotpoint_create' project_id=project.id %}
                 {% if project.plot_points.all %}
-                    <div class="plotpoints-list">
+                    <div class="items-list">
                         {% for plot_point in project.plot_points.all %}
                             {% include "core/_includes/item_list.html" with item=plot_point item_type='plot_point' project_id=project.id edit_url_name='plotpoint_edit' delete_url_name='plotpoint_delete' %}
                         {% endfor %}
@@ -77,7 +77,7 @@
             <div class="form-section">
                 {% include "core/_includes/section_header.html" with section_title="Research Notes" view_all_url_name='researchnote_list' add_url_name='researchnote_create' project_id=project.id %}
                 {% if project.research_notes.all %}
-                    <div class="plotpoints-list">
+                    <div class="items-list">
                         {% for research_note in project.research_notes.all %}
                             {% include "core/_includes/item_list.html" with item=research_note item_type='research_note' project_id=project.id edit_url_name='researchnote_edit' delete_url_name='researchnote_delete' %}
                         {% endfor %}

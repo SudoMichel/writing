@@ -1,22 +1,22 @@
 {% load core_extras %}
 
-<div class="plotpoint-item">
-    <div class="plotpoint-content">
+<div class="item-list">
+    <div class="item-content">
         <h3>{{ item.title }}</h3>
 
         {% if item_type == 'plot_point' %}
             <div class="item-body">
                 <p>{{ item.description|truncatewords_var:trunc }}</p>
-                {% if plot_point.characters.all or plot_point.places.all or plot_point.organizations.all %}
-                    <div class="plotpoint-relations">
-                        {% if plot_point.characters.all %}
-                            <span class="relation-tag">Characters: {{ plot_point.characters.all|join:", " }}</span>
+                {% if item.characters.all or item.places.all or item.organizations.all %}
+                    <div class="item-relations">
+                        {% if item.characters.all %}
+                            <span class="relation-tag">Characters: {{ item.characters.all|join:", " }}</span>
                         {% endif %}
-                        {% if plot_point.places.all %}
-                            <span class="relation-tag">Places: {{ plot_point.places.all|join:", " }}</span>
+                        {% if item.places.all %}
+                            <span class="relation-tag">Places: {{ item.places.all|join:", " }}</span>
                         {% endif %}
-                        {% if plot_point.organizations.all %}
-                            <span class="relation-tag">Organizations: {{ plot_point.organizations.all|join:", " }}</span>
+                        {% if item.organizations.all %}
+                            <span class="relation-tag">Organizations: {{ item.organizations.all|join:", " }}</span>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -24,24 +24,24 @@
         {% elif item_type == 'research_note' %}
             <div class="item-body">
                 <p>{{ item.content|truncatewords_var:trunc }}</p>
-                {% if note.tags %}
-                    <div class="note-tags">
-                        {% for tag in note.tags.split %}
+                {% if item.tags %}
+                    <div class="item-tags">
+                        {% for tag in item.tags.split %}
                             <span class="relation-tag">{{ tag }}</span>
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% if note.file %}
+                {% if item.file %}
                     <div class="item-type">
-                        <a href="{{ note.file.url }}" target="_blank" class="file-link">
-                            <i class="fas fa-file"></i> {{ note.file.name }}
+                        <a href="{{ item.file.url }}" target="_blank" class="file-link">
+                            <i class="fas fa-file"></i> {{ item.file.name }}
                         </a>
                     </div>
                 {% endif %}
             </div>
         {% endif %}
     </div>
-    <div class="plotpoint-actions">
+    <div class="item-actions">
         <a href="{% url edit_url_name project_id item.id %}" class="btn">Edit</a>
         <a href="{% url delete_url_name project_id item.id %}" class="btn">Delete</a>
     </div>

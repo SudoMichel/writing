@@ -14,20 +14,20 @@
             
             <div class="form-group">
                 <label for="purpose">Purpose *</label>
+                <textarea id="purpose" name="purpose" rows="3" required>{{ organization.purpose|default:'' }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Notes</label>
                 <div class="description-container">
-                    <textarea id="purpose" name="purpose" rows="3" required>{{ organization.purpose|default:'' }}</textarea>
+                    <textarea id="notes" name="notes" rows="3">{{ organization.notes|default:'' }}</textarea>
                     {% if organization %}
-                    <button type="button" id="improve-description" class="btn" onclick="improveDescription()">
+                    <button type="button" id="improve-organization" class="btn" data-project-id="{{ project.id }}" data-organization-id="{{ organization.id }}">
                         Improve with AI
                     </button>
                     {% endif %}
                 </div>
                 <div id="improvement-status" class="improvement-status"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <textarea id="notes" name="notes" rows="3">{{ organization.notes|default:'' }}</textarea>
             </div>
         </div>
         
@@ -52,35 +52,4 @@
         </div>
     </form>
 </div>
-
-
-<script>
-async function improveDescription() {
-    const statusDiv = document.getElementById('improvement-status');
-    const improveButton = document.getElementById('improve-description');
-    const purposeTextarea = document.getElementById('purpose');
-    
-    try {
-        statusDiv.textContent = 'Improving description...';
-        statusDiv.className = 'improvement-status loading';
-        improveButton.disabled = true;
-        
-        const response = await fetch(`/ai/improve-organization-description/{{ project.id }}/{{ organization.id }}/`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            purposeTextarea.value = data.improved_description;
-            statusDiv.textContent = 'Description improved successfully!';
-            statusDiv.className = 'improvement-status success';
-        } else {
-            throw new Error(data.message || 'Failed to improve description');
-        }
-    } catch (error) {
-        statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.className = 'improvement-status error';
-    } finally {
-        improveButton.disabled = false;
-    }
-}
-</script>
 {% endblock %} 

@@ -25,7 +25,7 @@
                 <div class="bio-container">
                     <textarea id="bio" name="bio" rows="4" required>{{ character.bio|default:'' }}</textarea>
                     {% if character %}
-                    <button type="button" id="improve-bio" class="btn" onclick="improveBio()">
+                    <button type="button" id="improve-bio" class="btn" data-project-id="{{ project.id }}" data-character-id="{{ character.id }}">
                         Improve with AI
                     </button>
                     {% endif %}
@@ -66,35 +66,4 @@
         </div>
     </form>
 </div>
-
-
-<script>
-async function improveBio() {
-    const statusDiv = document.getElementById('improvement-status');
-    const improveButton = document.getElementById('improve-bio');
-    const bioTextarea = document.getElementById('bio');
-    
-    try {
-        statusDiv.textContent = 'Improving bio...';
-        statusDiv.className = 'improvement-status loading';
-        improveButton.disabled = true;
-        
-        const response = await fetch(`/ai/improve-character-bio/{{ project.id }}/{{ character.id }}/`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            bioTextarea.value = data.improved_bio;
-            statusDiv.textContent = 'Bio improved successfully!';
-            statusDiv.className = 'improvement-status success';
-        } else {
-            throw new Error(data.message || 'Failed to improve bio');
-        }
-    } catch (error) {
-        statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.className = 'improvement-status error';
-    } finally {
-        improveButton.disabled = false;
-    }
-}
-</script>
 {% endblock %} 

@@ -23,24 +23,11 @@
         {% if project %}
             
             <div class="form-section">
-                {% include "core/_includes/section_header.html" 
-                    with 
-                        section_title="Characters" 
-                        view_all_url_name='character_list' 
-                        add_url_name='character_create' 
-                        project_id=project.id 
-                %}
+                {% include "core/_includes/section_header.html" with section_title="Characters" view_all_url_name='character_list' add_url_name='character_create' project_id=project.id %}
                 {% if project.characters.all %}
                     <div class="items-grid">
                     {% for character in project.characters.all %}
-                        {% include "core/_includes/item_card.html" 
-                            with 
-                                item=character 
-                                item_type='character' 
-                                project_id=project.id 
-                                edit_url_name='character_edit' 
-                                delete_url_name='character_delete' 
-                        %}
+                        {% include "core/_includes/item_card.html" with item=character item_type='character' project_id=project.id edit_url_name='character_edit' delete_url_name='character_delete' %}
                     {% endfor %}
                     </div>
                 {% else %}
@@ -49,24 +36,11 @@
             </div> 
 
             <div class="form-section">
-                {% include "core/_includes/section_header.html" 
-                    with 
-                        section_title="Places" 
-                        view_all_url_name='place_list' 
-                        add_url_name='place_create' 
-                        project_id=project.id 
-                %}
+                {% include "core/_includes/section_header.html" with section_title="Places" view_all_url_name='place_list' add_url_name='place_create' project_id=project.id %}
                 {% if project.places.all %}
                     <div class="items-grid">
                         {% for place in project.places.all %}
-                            {% include "core/_includes/item_card.html" 
-                                with 
-                                    item=place 
-                                    item_type='place' 
-                                    project_id=project.id 
-                                    edit_url_name='place_edit' 
-                                    delete_url_name='place_delete' 
-                            %}
+                            {% include "core/_includes/item_card.html" with item=place item_type='place' project_id=project.id edit_url_name='place_edit' delete_url_name='place_delete' %}
                         {% endfor %}
                     </div>
                 {% else %}
@@ -75,24 +49,11 @@
             </div>
 
             <div class="form-section">
-                {% include "core/_includes/section_header.html" 
-                    with 
-                        section_title="Organizations" 
-                        view_all_url_name='organization_list' 
-                        add_url_name='organization_create' 
-                        project_id=project.id 
-                %}
+                {% include "core/_includes/section_header.html" with section_title="Organizations" view_all_url_name='organization_list' add_url_name='organization_create' project_id=project.id %}
                 {% if project.organizations.all %}
                     <div class="items-grid">
                         {% for organization in project.organizations.all %}
-                            {% include "core/_includes/item_card.html" 
-                                with 
-                                    item=organization 
-                                    item_type='organization' 
-                                    project_id=project.id 
-                                    edit_url_name='organization_edit' 
-                                    delete_url_name='organization_delete' 
-                            %}
+                            {% include "core/_includes/item_card.html" with item=organization item_type='organization' project_id=project.id edit_url_name='organization_edit' delete_url_name='organization_delete' %}
                         {% endfor %}
                     </div>
                 {% else %}
@@ -101,24 +62,11 @@
             </div>
 
             <div class="form-section">
-                {% include "core/_includes/section_header.html" 
-                    with 
-                        section_title="Plot Points" 
-                        view_all_url_name='plotpoint_list' 
-                        add_url_name='plotpoint_create' 
-                        project_id=project.id 
-                %}
+                {% include "core/_includes/section_header.html" with section_title="Plot Points" view_all_url_name='plotpoint_list' add_url_name='plotpoint_create' project_id=project.id %}
                 {% if project.plot_points.all %}
                     <div class="plotpoints-list">
                         {% for plot_point in project.plot_points.all %}
-                            {% include "core/_includes/item_list.html" 
-                                with 
-                                    item=plot_point 
-                                    item_type='plot_point' 
-                                    project_id=project.id 
-                                    edit_url_name='plotpoint_edit' 
-                                    delete_url_name='plotpoint_delete' 
-                            %}
+                            {% include "core/_includes/item_list.html" with item=plot_point item_type='plot_point' project_id=project.id edit_url_name='plotpoint_edit' delete_url_name='plotpoint_delete' %}
                         {% endfor %}
                     </div>
                 {% else %}
@@ -127,24 +75,11 @@
             </div>
 
             <div class="form-section">
-                {% include "core/_includes/section_header.html" 
-                    with 
-                        section_title="Research Notes" 
-                        view_all_url_name='researchnote_list' 
-                        add_url_name='researchnote_create' 
-                        project_id=project.id 
-                %}
+                {% include "core/_includes/section_header.html" with section_title="Research Notes" view_all_url_name='researchnote_list' add_url_name='researchnote_create' project_id=project.id %}
                 {% if project.research_notes.all %}
                     <div class="plotpoints-list">
                         {% for research_note in project.research_notes.all %}
-                            {% include "core/_includes/item_list.html" 
-                                with 
-                                    item=research_note 
-                                    item_type='research_note' 
-                                    project_id=project.id 
-                                    edit_url_name='researchnote_edit' 
-                                    delete_url_name='researchnote_delete' 
-                            %}
+                            {% include "core/_includes/item_list.html" with item=research_note item_type='research_note' project_id=project.id edit_url_name='researchnote_edit' delete_url_name='researchnote_delete' %}
                         {% endfor %}
                     </div>
                 {% else %}

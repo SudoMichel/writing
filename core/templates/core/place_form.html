@@ -27,6 +27,9 @@
                     <button type="button" id="improve-description" class="btn" data-project-id="{{ project.id }}" data-place-id="{{ place.id }}">
                         Improve with AI
                     </button>
+                    <button type="button" class="btn show-prompt-btn" data-project-id="{{ project.id }}" data-entity-type="place" data-place-id="{{ place.id }}" data-status-id="improvement-status">
+                        Show Prompt
+                    </button>
                     {% endif %}
                 </div>
                 <div id="improvement-status" class="improvement-status"></div>

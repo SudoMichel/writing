@@ -59,7 +59,84 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    
+    // Show Prompt buttons
+    setupShowPromptButtons();
 });
+
+function setupShowPromptButtons() {
+    const showPromptButtons = document.querySelectorAll('.show-prompt-btn');
+    showPromptButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const projectId = this.dataset.projectId;
+            const entityType = this.dataset.entityType;
+            const entityId = this.dataset.entityId || 
+                             this.dataset.placeId || 
+                             this.dataset.organizationId || 
+                             this.dataset.characterId ||
+                             this.dataset.chapterId;
+            
+            showPrompt(projectId, entityType, entityId, this.dataset.statusId);
+        });
+    });
+}
+
+async function showPrompt(projectId, entityType, entityId, statusId) {
+    const statusDiv = document.getElementById(statusId);
+    
+    try {
+        statusDiv.textContent = 'Loading prompt...';
+        statusDiv.className = 'improvement-status loading';
+        
+        const response = await fetch(`/ai/get-prompt/${projectId}/${entityType}/${entityId}/`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const promptDiv = document.createElement('div');
+            promptDiv.classList.add('prompt-display');
+            promptDiv.style.whiteSpace = 'pre-wrap';
+            promptDiv.style.border = '1px solid #ccc';
+            promptDiv.style.padding = '10px';
+            promptDiv.style.margin = '10px 0';
+            promptDiv.style.backgroundColor = '#f9f9f9';
+            promptDiv.style.maxHeight = '300px';
+            promptDiv.style.overflowY = 'auto';
+            promptDiv.style.fontFamily = 'monospace';
+            promptDiv.style.fontSize = '12px';
+            promptDiv.textContent = data.prompt;
+            
+            statusDiv.textContent = 'Prompt:';
+            statusDiv.className = 'improvement-status info';
+            
+            // Remove previous prompt if exists
+            const existingPrompt = statusDiv.nextElementSibling;
+            if (existingPrompt && existingPrompt.classList.contains('prompt-display')) {
+                existingPrompt.remove();
+            }
+            
+            // Add close button
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.classList.add('btn', 'btn-secondary');
+            closeButton.style.marginTop = '5px';
+            closeButton.onclick = () => {
+                promptDiv.remove();
+                closeButton.remove();
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            };
+            
+            // Insert after status div
+            statusDiv.parentNode.insertBefore(promptDiv, statusDiv.nextSibling);
+            promptDiv.parentNode.insertBefore(closeButton, promptDiv.nextSibling);
+        } else {
+            throw new Error(data.message || 'Failed to get prompt');
+        }
+    } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.className = 'improvement-status error';
+    }
+}
 
 async function improve(config) {
     const statusDiv = document.getElementById(config.statusId);

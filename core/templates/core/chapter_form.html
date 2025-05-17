@@ -31,6 +31,9 @@
                 <button type="button" id="write-chapter" class="btn" data-project-id="{{ project.id }}" data-chapter-id="{{ chapter.id }}" style="margin-top: 5px;">
                     Write with AI
                 </button>
+                <button type="button" class="btn show-prompt-btn" data-project-id="{{ project.id }}" data-entity-type="chapter" data-chapter-id="{{ chapter.id }}" data-status-id="chapter-writing-status" style="margin-top: 5px;">
+                    Show Prompt
+                </button>
                 {% endif %}
                 <div id="chapter-writing-status" class="improvement-status"></div>
             </div>

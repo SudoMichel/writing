@@ -243,3 +243,48 @@ def generate_chapter_content(request, project_id, chapter_id):
             'status': 'error',
             'message': f'Error generating chapter content: {str(e)}'
         }, status=500)
+
+@require_api_key
+def get_prompt(request, project_id, entity_type, entity_id):
+    """Returns the prompt that would be used without executing it."""
+    project = get_object_or_404(Project, pk=project_id)
+    _, llm_context = get_project_context(project)
+    
+    if entity_type == 'character':
+        entity = get_object_or_404(Character, pk=entity_id, project=project)
+        prompt = CHARACTER_BIO_PROMPT.format(
+            name=entity.name,
+            description=entity.description,
+            llm_context=llm_context
+        )
+    elif entity_type == 'place':
+        entity = get_object_or_404(Place, pk=entity_id, project=project)
+        prompt = PLACE_DESCRIPTION_PROMPT.format(
+            name=entity.name,
+            description=entity.description,
+            llm_context=llm_context
+        )
+    elif entity_type == 'organization':
+        entity = get_object_or_404(Organization, pk=entity_id, project=project)
+        prompt = ORG_DESCRIPTION_PROMPT.format(
+            name=entity.name,
+            org_type=entity.type,
+            description=entity.description,
+            llm_context=llm_context
+        )
+    elif entity_type == 'chapter':
+        entity = get_object_or_404(Chapter, pk=entity_id, project=project)
+        prompt = CHAPTER_CONTENT_PROMPT.format(
+            chapter_title=entity.title or "Untitled",
+            chapter_number=entity.chapter_number or "N/A",
+            point_of_view_character=entity.point_of_view.name if entity.point_of_view else "Not specified",
+            chapter_notes=entity.notes or "None",
+            llm_context=llm_context
+        )
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid entity type'}, status=400)
+    
+    return JsonResponse({
+        'status': 'success',
+        'prompt': prompt
+    })

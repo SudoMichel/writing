@@ -3,7 +3,8 @@ import os
 from django.http import JsonResponse
 from core.models import Project, Character, PlotPoint, Place, Organization
 import json
-import google.generativeai as genai
+from .llm_utils import generate_llm_response
+from .prompts import CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT, ORG_DESCRIPTION_PROMPT, PROJECT_SUMMARY_PROMPT
 
 
 def get_project_context(project):
@@ -89,249 +90,96 @@ Organizations:
     
     return context_data, llm_context
 
+def require_api_key(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not os.getenv('GOOGLE_API_KEY'):
+            return JsonResponse({'status': 'error', 'message': 'Google API key not found in environment variables'}, status=400)
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+@require_api_key
 def test_api_key(request):
     api_key = os.getenv('GOOGLE_API_KEY')
-    if api_key:
-        return JsonResponse({
-            'status': 'success',
-            'message': 'API key is accessible',
-            'key_length': len(api_key)
-        })
-    else:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'API key not found in environment variables'
-        }, status=400)
+    return JsonResponse({
+        'status': 'success',
+        'message': 'API key is accessible',
+        'key_length': len(api_key)
+    })
 
+@require_api_key
 def test_project_context(request, project_id):
-    # Get the project and all related data
     project = get_object_or_404(Project, pk=project_id)
-    
-    # Get the context data
     context_data, llm_context = get_project_context(project)
-    
     return JsonResponse({
         'status': 'success',
         'context': llm_context,
         'raw_data': context_data
     })
 
+@require_api_key
 def test_llm_summary(request, project_id):
-    # Get the project context
     project = get_object_or_404(Project, pk=project_id)
-    
-    # Configure the Google Generative AI
-    api_key = os.getenv('GOOGLE_API_KEY')
-    if not api_key:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Google API key not found in environment variables'
-        }, status=400)
-    
-    genai.configure(api_key=api_key)
-    
-    # Get the context data
-    context_data, llm_context = get_project_context(project)
-    
+    _, llm_context = get_project_context(project)
     try:
-        # Initialize the model
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        
-        # Create the prompt
-        prompt = f"""Please provide a comprehensive summary of this writing project. Include:
-1. A brief overview of the project
-2. Key characters and their roles
-3. Main plot points in order
-4. Important locations and organizations
-5. Any notable relationships or dynamics between characters
-
-Here is the project data:
-{llm_context}"""
-        
-        # Generate the summary
-        response = model.generate_content(prompt)
-        
+        prompt = PROJECT_SUMMARY_PROMPT.format(llm_context=llm_context)
+        summary = generate_llm_response(prompt)
         return JsonResponse({
             'status': 'success',
-            'summary': response.text,
+            'summary': summary,
             'raw_context': llm_context
         })
-        
     except Exception as e:
         return JsonResponse({
             'status': 'error',
             'message': f'Error generating summary: {str(e)}'
         }, status=500)
 
-def improve_character_bio(request, project_id, character_id):
-    # Get the project and character
+@require_api_key
+def improve_entity_description(request, project_id, entity_type, entity_id):
     project = get_object_or_404(Project, pk=project_id)
-    character = get_object_or_404(Character, pk=character_id, project=project)
-    
-    # Configure the Google Generative AI
-    api_key = os.getenv('GOOGLE_API_KEY')
-    if not api_key:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Google API key not found in environment variables'
-        }, status=400)
-    
-    genai.configure(api_key=api_key)
-    
-    # Get the context data
-    context_data, llm_context = get_project_context(project)
-    
+    _, llm_context = get_project_context(project)
+    if entity_type == 'character':
+        entity = get_object_or_404(Character, pk=entity_id, project=project)
+        prompt = CHARACTER_BIO_PROMPT.format(
+            name=entity.name,
+            description=entity.description,
+            llm_context=llm_context
+        )
+        key = 'improved_bio'
+        name_key = 'character_name'
+        name_val = entity.name
+    elif entity_type == 'place':
+        entity = get_object_or_404(Place, pk=entity_id, project=project)
+        prompt = PLACE_DESCRIPTION_PROMPT.format(
+            name=entity.name,
+            description=entity.description,
+            llm_context=llm_context
+        )
+        key = 'improved_description'
+        name_key = 'place_name'
+        name_val = entity.name
+    elif entity_type == 'organization':
+        entity = get_object_or_404(Organization, pk=entity_id, project=project)
+        prompt = ORG_DESCRIPTION_PROMPT.format(
+            name=entity.name,
+            org_type=entity.type,
+            description=entity.description,
+            llm_context=llm_context
+        )
+        key = 'improved_description'
+        name_key = 'organization_name'
+        name_val = entity.name
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid entity type'}, status=400)
     try:
-        # Initialize the model
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        
-        # Create the prompt
-        prompt = f"""Please improve and expand the bio for the character "{character.name}" in this writing project. 
-Consider their role, traits, relationships, and involvement in plot points to create a more detailed and engaging character bio.
-The bio should be consistent with the existing project context and maintain the character's established personality and relationships. 
-It should be plain text and have a literary quality. Don't add any comments or explanation.
-
-Current character description:
-{character.description}
-
-Here is the full project context:
-{llm_context}
-
-Please provide an improved version of the character's bio that:
-1. Expands on their background and motivations
-2. Incorporates their relationships with other characters
-3. References their involvement in key plot points
-4. Maintains consistency with their established traits
-5. Adds depth while staying true to their role in the story"""
-        
-        # Generate the improved bio
-        response = model.generate_content(prompt)
-        
+        improved_text = generate_llm_response(prompt)
         return JsonResponse({
             'status': 'success',
-            'improved_bio': response.text,
-            'character_name': character.name
+            key: improved_text,
+            name_key: name_val
         })
-        
     except Exception as e:
         return JsonResponse({
             'status': 'error',
-            'message': f'Error improving character bio: {str(e)}'
-        }, status=500)
-
-def improve_place_description(request, project_id, place_id):
-    # Get the project and place
-    project = get_object_or_404(Project, pk=project_id)
-    place = get_object_or_404(Place, pk=place_id, project=project)
-    
-    # Configure the Google Generative AI
-    api_key = os.getenv('GOOGLE_API_KEY')
-    if not api_key:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Google API key not found in environment variables'
-        }, status=400)
-    
-    genai.configure(api_key=api_key)
-    
-    # Get the context data
-    context_data, llm_context = get_project_context(project)
-    
-    try:
-        # Initialize the model
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        
-        # Create the prompt
-        prompt = f"""Please improve and expand the description for the place "{place.name}" in this writing project. 
-Consider its type, role in the story, and connections to characters and plot points to create a more detailed and engaging place description.
-The description should be consistent with the existing project context and maintain the place's established characteristics and significance.
-It should be plain text, not json and it should have a literary quality. Very aestetic language. Don't add any comments or explanation.
-
-Current place description:
-{place.description}
-
-Here is the full project context:
-{llm_context}
-
-Please provide an improved version of the place's description that:
-1. Expands on its physical characteristics and atmosphere
-2. Incorporates its significance to the story and characters
-3. References its involvement in key plot points
-4. Maintains consistency with its established type and role
-5. Adds depth while staying true to its purpose in the story
-6. Has a literary quality and vivid imagery"""
-        
-        # Generate the improved description
-        response = model.generate_content(prompt)
-        
-        return JsonResponse({
-            'status': 'success',
-            'improved_description': response.text,
-            'place_name': place.name
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Error improving place description: {str(e)}'
-        }, status=500)
-
-def improve_organization_description(request, project_id, organization_id):
-    # Get the project and organization
-    project = get_object_or_404(Project, pk=project_id)
-    organization = get_object_or_404(Organization, pk=organization_id, project=project)
-    
-    # Configure the Google Generative AI
-    api_key = os.getenv('GOOGLE_API_KEY')
-    if not api_key:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Google API key not found in environment variables'
-        }, status=400)
-    
-    genai.configure(api_key=api_key)
-    
-    # Get the context data
-    context_data, llm_context = get_project_context(project)
-    
-    try:
-        # Initialize the model
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        
-        # Create the prompt
-        prompt = f"""Please improve and expand the description for the organization "{organization.name}" in this writing project. 
-Consider its type, members, and role in the story to create a more detailed and engaging organization description.
-The description should be consistent with the existing project context and maintain the organization's established characteristics and significance.
-It should be plain text, not json and it should have a literary quality. Very aestetic language. Don't add any comments or explanation.
-
-Current organization type:
-{organization.type}
-
-Current organization description:
-{organization.description}
-
-Here is the full project context:
-{llm_context}
-
-Please provide an improved version of the organization's description that:
-1. Expands on its type and goals
-2. Incorporates its relationships with characters and other organizations
-3. References its involvement in key plot points
-4. Maintains consistency with its established role and influence
-5. Adds depth while staying true to its purpose in the story
-6. Has a literary quality and vivid description of its operations and culture"""
-        
-        # Generate the improved description
-        response = model.generate_content(prompt)
-        
-        return JsonResponse({
-            'status': 'success',
-            'improved_description': response.text,
-            'organization_name': organization.name
-        })
-        
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Error improving organization description: {str(e)}'
+            'message': f'Error improving {entity_type} description: {str(e)}'
         }, status=500)

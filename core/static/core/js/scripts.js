@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
             improve({
                 buttonId: 'improve-description',
                 statusId: 'improvement-status',
-                textareaId: 'description',
-                endpoint: '/ai/improve-place-description/',
+                textareaId: 'id_description',
+                endpoint: '/ai/improve/place/',
                 successProperty: 'improved_description',
                 successMessage: 'Description improved successfully!'
             });
@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
             improve({
                 buttonId: 'improve-organization',
                 statusId: 'improvement-status',
-                textareaId: 'notes',
-                endpoint: '/ai/improve-organization-description/',
+                textareaId: 'id_description',
+                endpoint: '/ai/improve/organization/',
                 successProperty: 'improved_description',
                 successMessage: 'Notes improved successfully!'
             });
@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
             improve({
                 buttonId: 'improve-bio',
                 statusId: 'improvement-status',
-                textareaId: 'bio',
-                endpoint: '/ai/improve-character-bio/',
+                textareaId: 'id_description',
+                endpoint: '/ai/improve/character/',
                 successProperty: 'improved_bio',
                 successMessage: 'Bio improved successfully!'
             });

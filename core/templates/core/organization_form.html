@@ -8,19 +8,19 @@
         <div class="form-section">
             <h2>Organization Details</h2>
             <div class="form-group">
-                <label for="name">Name *</label>
-                <input type="text" id="name" name="name" value="{{ organization.name|default:'' }}" required>
+                <label for="{{ form.name.id_for_label }}">Name *</label>
+                {{ form.name }}
             </div>
             
             <div class="form-group">
-                <label for="type">Type *</label>
-                <input type="text" id="type" name="type" value="{{ organization.type|default:'' }}" required>
+                <label for="{{ form.type.id_for_label }}">Type *</label>
+                {{ form.type }}
             </div>
             
             <div class="form-group">
-                <label for="description">Description</label>
+                <label for="{{ form.description.id_for_label }}">Description</label>
                 <div class="description-container">
-                    <textarea id="description" name="description" rows="3">{{ organization.description|default:'' }}</textarea>
+                    {{ form.description }}
                     {% if organization %}
                     <button type="button" id="improve-organization" class="btn" data-project-id="{{ project.id }}" data-organization-id="{{ organization.id }}">
                         Improve with AI
@@ -33,32 +33,12 @@
         
         <div class="form-section">
             <h2>Members</h2>
-            <div class="items-grid">
-                {% for character in characters %}
-                    <div class="item-card">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
-                                {% if organization and character in organization.characters.all %}checked{% endif %}>
-                            <span>{{ character.name }}</span>
-                        </label>
-                    </div>
-                {% endfor %}
-            </div>
+            {{ form.characters }}
         </div>
         
         <div class="form-section">
             <h2>Places</h2>
-            <div class="items-grid">
-                {% for place in places %}
-                    <div class="item-card">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="places" value="{{ place.id }}" id="place_{{ place.id }}"
-                                {% if organization and place in organization.places.all %}checked{% endif %}>
-                            <span>{{ place.name }} ({{ place.type }})</span>
-                        </label>
-                    </div>
-                {% endfor %}
-            </div>
+            {{ form.places }}
         </div>
         
         <div class="button-group">

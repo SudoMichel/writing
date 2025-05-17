@@ -10,25 +10,25 @@
         <div class="form-section">
             <h2>Research Note Details</h2>
             <div class="form-group">
-                <label for="title">Title *</label>
-                <input type="text" id="title" name="title" value="{{ note.title|default:'' }}" required>
+                <label for="{{ form.title.id_for_label }}">Title *</label>
+                {{ form.title }}
             </div>
             
             <div class="form-group">
-                <label for="content">Content *</label>
-                <textarea id="content" name="content" rows="8" required>{{ note.content|default:'' }}</textarea>
+                <label for="{{ form.content.id_for_label }}">Content *</label>
+                {{ form.content }}
             </div>
             
             <div class="form-group">
-                <label for="tags">Tags</label>
-                <input type="text" id="tags" name="tags" value="{{ note.tags|default:'' }}">
+                <label for="{{ form.tags.id_for_label }}">Tags</label>
+                {{ form.tags }}
                 <p class="help-text">Enter tags separated by commas</p>
             </div>
             
             <div class="form-group">
-                <label for="file">File</label>
+                <label for="{{ form.file.id_for_label }}">File</label>
                 <div class="file-input-wrapper">
-                    <input type="file" id="file" name="file">
+                    {{ form.file }}
                     {% if note.file %}
                         <p class="help-text">Current file: {{ note.file.name }}</p>
                     {% endif %}

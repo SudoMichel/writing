@@ -10,82 +10,45 @@
         <div class="form-section">
             <h2>Chapter Details</h2>
             <div class="form-group">
-                <label for="title">Title *</label>
-                <input type="text" id="title" name="title" value="{{ chapter.title|default:'' }}" required>
+                <label for="{{ form.title.id_for_label }}">Title *</label>
+                {{ form.title }}
             </div>
             
             <div class="form-group">
-                <label for="chapter_number">Chapter Number</label>
-                <input type="number" id="chapter_number" name="chapter_number" value="{% if chapter %}{{ chapter.chapter_number }}{% else %}{{ next_chapter_number|default:'1' }}{% endif %}" min="1">
+                <label for="{{ form.chapter_number.id_for_label }}">Chapter Number</label>
+                {{ form.chapter_number }}
             </div>
             
             <div class="form-group">
-                <label for="point_of_view">Point of View Character</label>
-                <select id="point_of_view" name="point_of_view">
-                    <option value="">-- No specific POV --</option>
-                    {% for character in characters %}
-                        <option value="{{ character.id }}" {% if chapter.point_of_view.id == character.id %}selected{% endif %}>
-                            {{ character.name }}
-                        </option>
-                    {% endfor %}
-                </select>
+                <label for="{{ form.point_of_view.id_for_label }}">Point of View Character</label>
+                {{ form.point_of_view }}
             </div>
             
             <div class="form-group">
-                <label for="content">Content</label>
-                <textarea id="content" name="content" rows="10">{{ chapter.content|default:'' }}</textarea>
+                <label for="{{ form.content.id_for_label }}">Content</label>
+                {{ form.content }}
             </div>
             
             <div class="form-group">
-                <label for="notes">Notes (Private)</label>
-                <textarea id="notes" name="notes" rows="5">{{ chapter.notes|default:'' }}</textarea>
+                <label for="{{ form.notes.id_for_label }}">Notes (Private)</label>
+                {{ form.notes }}
                 <small class="form-text text-muted">These notes are for your reference only and won't be included in the final work.</small>
             </div>
         </div>
         
         <div class="form-section">
             <h2>Characters</h2>
-            <div class="items-grid">
-                {% for character in characters %}
-                    <div class="item-card">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="characters" value="{{ character.id }}" id="character_{{ character.id }}"
-                                {% if chapter and character in chapter.characters.all %}checked{% endif %}>
-                            <span>{{ character.name }}</span>
-                        </label>
-                    </div>
-                {% endfor %}
-            </div>
+            {{ form.characters }}
         </div>
         
         <div class="form-section">
             <h2>Places</h2>
-            <div class="items-grid">
-                {% for place in places %}
-                    <div class="item-card">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="places" value="{{ place.id }}" id="place_{{ place.id }}"
-                                {% if chapter and place in chapter.places.all %}checked{% endif %}>
-                            <span>{{ place.name }} ({{ place.type }})</span>
-                        </label>
-                    </div>
-                {% endfor %}
-            </div>
+            {{ form.places }}
         </div>
         
         <div class="form-section">
             <h2>Organizations</h2>
-            <div class="items-grid">
-                {% for organization in organizations %}
-                    <div class="item-card">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="organizations" value="{{ organization.id }}" id="organization_{{ organization.id }}"
-                                {% if chapter and organization in chapter.organizations.all %}checked{% endif %}>
-                            <span>{{ organization.name }}</span>
-                        </label>
-                    </div>
-                {% endfor %}
-            </div>
+            {{ form.organizations }}
         </div>
         
         <div class="form-section">

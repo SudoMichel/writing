@@ -11,19 +11,19 @@
         <div class="form-section">
             <h2>Character Details</h2>
             <div class="form-group">
-                <label for="name">Name *</label>
-                <input type="text" id="name" name="name" value="{{ character.name|default:'' }}" required>
+                <label for="{{ form.name.id_for_label }}">Name *</label>
+                {{ form.name }}
             </div>
             
             <div class="form-group">
-                <label for="role">Role *</label>
-                <input type="text" id="role" name="role" value="{{ character.role|default:'' }}" required>
+                <label for="{{ form.role.id_for_label }}">Role *</label>
+                {{ form.role }}
             </div>
             
             <div class="form-group">
-                <label for="description">Description *</label>
+                <label for="{{ form.description.id_for_label }}">Description *</label>
                 <div class="bio-container">
-                    <textarea id="description" name="description" rows="4" required>{{ character.description|default:'' }}</textarea>
+                    {{ form.description }}
                     {% if character %}
                     <button type="button" id="improve-bio" class="btn" data-project-id="{{ project.id }}" data-character-id="{{ character.id }}">
                         Improve with AI
@@ -34,8 +34,8 @@
             </div>
             
             <div class="form-group">
-                <label for="traits">Character Traits</label>
-                <textarea id="traits" name="traits" rows="3">{{ character.traits|default:'' }}</textarea>
+                <label for="{{ form.traits.id_for_label }}">Character Traits</label>
+                {{ form.traits }}
                 <p class="help-text">Example: Brave, Loyal, Quick-tempered, etc.</p>
             </div>
         </div>

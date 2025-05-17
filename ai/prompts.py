@@ -75,7 +75,18 @@ Chapter Notes: {chapter_notes}
 
 Write narrative fiction with dialogue and description appropriate to the story.
 Be consistent with existing characters, plot progression, and tone.
-Provide only the chapter content without comments or explanations.
+Provide only the chapter content without comments or explanations. No chapter title, chapter number, or chapter notes.
 
 Relevant project context:
-{llm_context}''' 
+{llm_context}'''
+
+REFINE_TEXT_PROMPT = '''Please refine the following text to improve its language, word choice, and sentence structure.
+The goal is to make the text more clear, eloquent, vivid, and aesthetically pleasing.
+Focus solely on linguistic refinement. Do NOT add new information, change the core meaning, or expand the content.
+The refined text should be a direct replacement for the original, maintaining its original intent and length as much as possible while enhancing its literary quality.
+Output plain text only. Aim for the style of Nabokov.
+
+Original text:
+{text_to_refine}
+
+Refined text:''' 

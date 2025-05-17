@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show Prompt buttons
     setupShowPromptButtons();
+    
+    // Refine Text buttons
+    setupRefineTextButtons();
 });
 
 function setupShowPromptButtons() {
@@ -213,5 +216,121 @@ async function improve(config) {
         statusDiv.className = 'improvement-status error';
         proposalContainer.innerHTML = '';
         improveButton.disabled = false; // Re-enable button on error
+    }
+}
+
+function setupRefineTextButtons() {
+    const refineTextButtons = document.querySelectorAll('.refine-text-btn');
+    refineTextButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const projectId = this.dataset.projectId;
+            const entityType = this.dataset.entityType;
+            // Determine entityId based on available data attributes
+            const entityId = this.dataset.characterId || 
+                             this.dataset.placeId || 
+                             this.dataset.organizationId ||
+                             this.dataset.chapterId; 
+            
+            let statusId = this.dataset.statusId || 'improvement-status'; 
+            let textareaId = this.dataset.textareaId || 'id_description'; 
+            let successProperty = 'refined_description'; 
+
+            if (entityType === 'character') {
+                successProperty = 'refined_bio';
+            } else if (entityType === 'chapter') {
+                successProperty = 'refined_content';
+                textareaId = 'id_content'; // Specific textarea for chapter content
+                statusId = this.dataset.statusId || 'chapter-writing-status'; // Specific status ID for chapters
+            }
+            // Add more conditions if other entity types/attributes are supported
+
+            refineText({
+                buttonId: this.id, 
+                statusId: statusId,
+                textareaId: textareaId,
+                endpoint: `/ai/refine/${entityType}/${projectId}/${entityId}/`,
+                successProperty: successProperty,
+                successMessage: 'Text refined successfully!',
+            });
+        });
+    });
+}
+
+async function refineText(config) {
+    const statusDiv = document.getElementById(config.statusId);
+    const refineButton = document.getElementById(config.buttonId); // Assumes button has an ID
+    const textarea = document.getElementById(config.textareaId);
+
+    let proposalContainerId = config.statusId + '-proposal-container';
+    let proposalContainer = document.getElementById(proposalContainerId);
+    if (!proposalContainer) {
+        proposalContainer = document.createElement('div');
+        proposalContainer.id = proposalContainerId;
+        proposalContainer.style.marginTop = '10px';
+        statusDiv.parentNode.insertBefore(proposalContainer, statusDiv.nextSibling);
+    }
+    proposalContainer.innerHTML = ''; // Clear previous proposals
+
+    try {
+        statusDiv.textContent = 'Refining text...';
+        statusDiv.className = 'improvement-status loading';
+        if (refineButton) refineButton.disabled = true;
+
+        // Note: The refine_attribute_text backend doesn't need project/item IDs in the POST body
+        // It gets them from the URL. It also doesn't need the current text from the form,
+        // as it fetches the attribute directly from the database entity.
+        const response = await fetch(config.endpoint); // GET request is fine as no body is sent
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            const proposedText = data[config.successProperty];
+            statusDiv.textContent = 'Refinement proposal ready:';
+            statusDiv.className = 'improvement-status info';
+
+            const proposalPreview = document.createElement('div');
+            proposalPreview.classList.add('proposal-preview');
+            proposalPreview.style.border = '1px solid #ccc';
+            proposalPreview.style.padding = '10px';
+            proposalPreview.style.marginBottom = '10px';
+            proposalPreview.style.maxHeight = '200px';
+            proposalPreview.style.overflowY = 'auto';
+            proposalPreview.style.backgroundColor = '#f9f9f9';
+            proposalPreview.style.whiteSpace = 'pre-wrap';
+            proposalPreview.textContent = proposedText;
+
+            const acceptButton = document.createElement('button');
+            acceptButton.textContent = 'Accept';
+            acceptButton.classList.add('btn', 'btn-success');
+            acceptButton.style.marginRight = '5px';
+            acceptButton.onclick = () => {
+                textarea.value = proposedText;
+                statusDiv.textContent = config.successMessage;
+                statusDiv.className = 'improvement-status success';
+                proposalContainer.innerHTML = '';
+                if (refineButton) refineButton.disabled = false;
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('btn', 'btn-secondary');
+            cancelButton.onclick = () => {
+                statusDiv.textContent = 'Refinement cancelled.';
+                statusDiv.className = 'improvement-status info';
+                proposalContainer.innerHTML = '';
+                if (refineButton) refineButton.disabled = false;
+            };
+
+            proposalContainer.appendChild(proposalPreview);
+            proposalContainer.appendChild(acceptButton);
+            proposalContainer.appendChild(cancelButton);
+
+        } else {
+            throw new Error(data.message || 'Failed to refine text');
+        }
+    } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
+        statusDiv.className = 'improvement-status error';
+        proposalContainer.innerHTML = '';
+        if (refineButton) refineButton.disabled = false;
     }
 }

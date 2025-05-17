@@ -12,4 +12,5 @@ urlpatterns = [
     path('improve/organization/<int:project_id>/<int:entity_id>/', views.improve_entity_description, {'entity_type': 'organization'}, name='improve_organization'),
     path('generate-chapter/<int:project_id>/<int:chapter_id>/', views.generate_chapter_content, name='generate_chapter_content'),
     path('get-prompt/<int:project_id>/<str:entity_type>/<int:entity_id>/', views.get_prompt, name='get_prompt'),
+    path('refine/<str:entity_type>/<int:project_id>/<int:entity_id>/', views.refine_attribute_text, name='refine_attribute_text'),
 ] 

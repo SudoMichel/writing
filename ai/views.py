@@ -4,7 +4,9 @@ from django.http import JsonResponse
 from core.models import Project, Character, PlotPoint, Place, Organization, Chapter, ResearchNote
 import json
 from .llm_utils import generate_llm_response
-from .prompts import CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT, ORG_DESCRIPTION_PROMPT, PROJECT_SUMMARY_PROMPT, CHAPTER_CONTENT_PROMPT
+from .prompts import (CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT, 
+                    ORG_DESCRIPTION_PROMPT, PROJECT_SUMMARY_PROMPT, 
+                    CHAPTER_CONTENT_PROMPT, REFINE_TEXT_PROMPT)
 
 
 def get_project_context(project):
@@ -288,3 +290,54 @@ def get_prompt(request, project_id, entity_type, entity_id):
         'status': 'success',
         'prompt': prompt
     })
+
+@require_api_key
+def refine_attribute_text(request, project_id, entity_type, entity_id):
+    project = get_object_or_404(Project, pk=project_id)
+    text_to_refine = ""
+    attribute_name = 'description' # Default attribute to refine
+
+    if entity_type == 'character':
+        entity = get_object_or_404(Character, pk=entity_id, project=project)
+        text_to_refine = entity.description
+        key = 'refined_bio' 
+        name_key = 'character_name'
+        name_val = entity.name
+    elif entity_type == 'place':
+        entity = get_object_or_404(Place, pk=entity_id, project=project)
+        text_to_refine = entity.description
+        key = 'refined_description'
+        name_key = 'place_name'
+        name_val = entity.name
+    elif entity_type == 'organization':
+        entity = get_object_or_404(Organization, pk=entity_id, project=project)
+        text_to_refine = entity.description
+        key = 'refined_description'
+        name_key = 'organization_name'
+        name_val = entity.name
+    elif entity_type == 'chapter':
+        entity = get_object_or_404(Chapter, pk=entity_id, project=project)
+        text_to_refine = entity.content
+        attribute_name = 'content'
+        key = 'refined_content'
+        name_key = 'chapter_title'
+        name_val = entity.title
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid entity type for refinement'}, status=400)
+
+    if not text_to_refine:
+        return JsonResponse({'status': 'error', 'message': f'No text found in {attribute_name} to refine for {entity_type} {entity_id}'}, status=400)
+
+    try:
+        prompt = REFINE_TEXT_PROMPT.format(text_to_refine=text_to_refine)
+        refined_text = generate_llm_response(prompt)
+        return JsonResponse({
+            'status': 'success',
+            key: refined_text,
+            name_key: name_val
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error refining {entity_type} {attribute_name}: {str(e)}'
+        }, status=500)

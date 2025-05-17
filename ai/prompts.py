@@ -65,4 +65,20 @@ PROJECT_SUMMARY_PROMPT = '''Please provide a comprehensive summary of this writi
 5. Any notable relationships or dynamics between characters
 
 Here is the project data:
-{llm_context}''' 
+{llm_context}'''
+
+CHAPTER_CONTENT_PROMPT = """Please write the content for a chapter in this writing project.
+The chapter details are as follows:
+Chapter Title: {chapter_title}
+Chapter Number: {chapter_number}
+Point of View Character: {point_of_view_character}
+Notes for this chapter: {chapter_notes}
+
+The chapter should be consistent with the existing project context, including characters, plot progression, and tone.
+The generated content should be plain text suitable for a novel or story. Do not add any comments, explanations, or meta-text.
+Focus on narrative, dialogue, and description as appropriate. Ensure the chapter flows logically from previous events (if any) and sets up future ones based on the overall plot.
+
+Here is the full project context:
+{llm_context}
+
+Please provide the chapter content:""" 

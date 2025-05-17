@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from core.models import Project, Character, PlotPoint, Place, Organization, Chapter, ResearchNote
 import json
 from .llm_utils import generate_llm_response
-from .prompts import CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT, ORG_DESCRIPTION_PROMPT, PROJECT_SUMMARY_PROMPT
+from .prompts import CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT, ORG_DESCRIPTION_PROMPT, PROJECT_SUMMARY_PROMPT, CHAPTER_CONTENT_PROMPT
 
 
 def get_project_context(project):
@@ -214,4 +214,32 @@ def improve_entity_description(request, project_id, entity_type, entity_id):
         return JsonResponse({
             'status': 'error',
             'message': f'Error improving {entity_type} description: {str(e)}'
+        }, status=500)
+
+@require_api_key
+def generate_chapter_content(request, project_id, chapter_id):
+    project = get_object_or_404(Project, pk=project_id)
+    chapter = get_object_or_404(Chapter, pk=chapter_id, project=project)
+    _, llm_context = get_project_context(project)
+
+    try:
+        prompt = CHAPTER_CONTENT_PROMPT.format(
+            chapter_title=chapter.title or "Untitled",
+            chapter_number=chapter.chapter_number or "N/A",
+            point_of_view_character=chapter.point_of_view.name if chapter.point_of_view else "Not specified",
+            chapter_notes=chapter.notes or "None",
+            llm_context=llm_context
+        )
+        
+        generated_content = generate_llm_response(prompt)
+        
+        return JsonResponse({
+            'status': 'success',
+            'generated_content': generated_content,
+            'chapter_title': chapter.title
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error generating chapter content: {str(e)}'
         }, status=500)

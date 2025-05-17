@@ -43,6 +43,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Chapter form write chapter button
+    const writeChapterButton = document.getElementById('write-chapter');
+    if (writeChapterButton) {
+        writeChapterButton.addEventListener('click', function() {
+            improve({
+                buttonId: 'write-chapter',
+                statusId: 'chapter-writing-status',
+                textareaId: 'id_content', // Assuming the content textarea has id 'id_content'
+                endpoint: '/ai/generate-chapter/',
+                successProperty: 'generated_content',
+                successMessage: 'Chapter content generated successfully!',
+                itemIdProperty: 'chapterId' // To pick up data-chapter-id
+            });
+        });
+    }
 });
 
 async function improve(config) {
@@ -50,27 +66,75 @@ async function improve(config) {
     const improveButton = document.getElementById(config.buttonId);
     const textarea = document.getElementById(config.textareaId);
     const projectId = improveButton.dataset.projectId;
-    const itemId = improveButton.dataset.placeId || improveButton.dataset.organizationId || improveButton.dataset.characterId;
-    
+    const itemId = improveButton.dataset[config.itemIdProperty || 'placeId'] || improveButton.dataset.organizationId || improveButton.dataset.characterId; // Use general itemIdProperty
+
+    let proposalContainerId = config.statusId + '-proposal-container';
+    let proposalContainer = document.getElementById(proposalContainerId);
+    if (!proposalContainer) {
+        proposalContainer = document.createElement('div');
+        proposalContainer.id = proposalContainerId;
+        proposalContainer.style.marginTop = '10px'; // Add some space
+        statusDiv.parentNode.insertBefore(proposalContainer, statusDiv.nextSibling);
+    }
+    proposalContainer.innerHTML = ''; // Clear previous proposals
+
     try {
-        statusDiv.textContent = 'Improving...';
+        statusDiv.textContent = 'Generating proposal...';
         statusDiv.className = 'improvement-status loading';
         improveButton.disabled = true;
-        
+
         const response = await fetch(`${config.endpoint}${projectId}/${itemId}/`);
         const data = await response.json();
-        
+
         if (data.status === 'success') {
-            textarea.value = data[config.successProperty];
-            statusDiv.textContent = config.successMessage;
-            statusDiv.className = 'improvement-status success';
+            const proposedText = data[config.successProperty];
+            statusDiv.textContent = 'Proposal ready:';
+            statusDiv.className = 'improvement-status info'; // A new class for neutral info
+
+            const proposalPreview = document.createElement('div');
+            proposalPreview.classList.add('proposal-preview');
+            proposalPreview.style.border = '1px solid #ccc';
+            proposalPreview.style.padding = '10px';
+            proposalPreview.style.marginBottom = '10px';
+            proposalPreview.style.maxHeight = '200px';
+            proposalPreview.style.overflowY = 'auto';
+            proposalPreview.style.backgroundColor = '#f9f9f9';
+            proposalPreview.style.whiteSpace = 'pre-wrap'; // To respect newlines from AI
+            proposalPreview.textContent = proposedText;
+
+            const acceptButton = document.createElement('button');
+            acceptButton.textContent = 'Accept';
+            acceptButton.classList.add('btn', 'btn-success'); // Assuming btn-success is available or can be styled
+            acceptButton.style.marginRight = '5px';
+            acceptButton.onclick = () => {
+                textarea.value = proposedText;
+                statusDiv.textContent = config.successMessage;
+                statusDiv.className = 'improvement-status success';
+                proposalContainer.innerHTML = '';
+                improveButton.disabled = false;
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('btn', 'btn-secondary');
+            cancelButton.onclick = () => {
+                statusDiv.textContent = 'Improvement cancelled.';
+                statusDiv.className = 'improvement-status info';
+                proposalContainer.innerHTML = '';
+                improveButton.disabled = false;
+            };
+
+            proposalContainer.appendChild(proposalPreview);
+            proposalContainer.appendChild(acceptButton);
+            proposalContainer.appendChild(cancelButton);
+
         } else {
-            throw new Error(data.message || 'Failed to improve content');
+            throw new Error(data.message || 'Failed to generate proposal');
         }
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
         statusDiv.className = 'improvement-status error';
-    } finally {
-        improveButton.disabled = false;
+        proposalContainer.innerHTML = '';
+        improveButton.disabled = false; // Re-enable button on error
     }
 }

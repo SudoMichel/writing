@@ -27,6 +27,12 @@
             <div class="form-group">
                 <label for="{{ form.content.id_for_label }}">Content</label>
                 {{ form.content }}
+                {% if chapter %}
+                <button type="button" id="write-chapter" class="btn" data-project-id="{{ project.id }}" data-chapter-id="{{ chapter.id }}" style="margin-top: 5px;">
+                    Write with AI
+                </button>
+                {% endif %}
+                <div id="chapter-writing-status" class="improvement-status"></div>
             </div>
             
             <div class="form-group">

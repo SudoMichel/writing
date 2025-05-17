@@ -72,6 +72,7 @@ class Organization(models.Model):
 class Chapter(models.Model):
     title = models.CharField(max_length=200)
     chapter_number = models.IntegerField(default=1)
+    notes = models.TextField(blank=True, help_text="Outline notes about this chapter")
     content = models.TextField(blank=True)
     point_of_view = models.ForeignKey(Character, on_delete=models.SET_NULL, related_name='pov_chapters', null=True, blank=True)
     characters = models.ManyToManyField(Character, related_name='chapters', blank=True)

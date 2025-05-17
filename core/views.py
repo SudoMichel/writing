@@ -623,6 +623,7 @@ def chapter_create(request, project_id):
         title = request.POST.get('title')
         chapter_number = request.POST.get('chapter_number', 1)
         content = request.POST.get('content', '')
+        notes = request.POST.get('notes', '')
         point_of_view_id = request.POST.get('point_of_view')
         
         if title:
@@ -630,6 +631,7 @@ def chapter_create(request, project_id):
                 title=title,
                 chapter_number=chapter_number,
                 content=content,
+                notes=notes,
                 project=project
             )
             
@@ -693,21 +695,21 @@ def chapter_edit(request, project_id, chapter_id):
         title = request.POST.get('title')
         chapter_number = request.POST.get('chapter_number', 1)
         content = request.POST.get('content', '')
+        notes = request.POST.get('notes', '')
         point_of_view_id = request.POST.get('point_of_view')
         
         if title:
             chapter.title = title
             chapter.chapter_number = chapter_number
             chapter.content = content
-            
+            chapter.notes = notes
+            chapter.point_of_view = None
             if point_of_view_id:
                 try:
                     character = Character.objects.get(id=point_of_view_id, project=project)
                     chapter.point_of_view = character
                 except Character.DoesNotExist:
-                    chapter.point_of_view = None
-            else:
-                chapter.point_of_view = None
+                    pass
                 
             chapter.save()
             
@@ -741,18 +743,16 @@ def chapter_edit(request, project_id, chapter_id):
     organizations = project.organizations.all()
     all_plot_points = project.plot_points.all()
     chapter_plot_points = project.plot_points.filter(chapter=chapter)
-    plot_points = chapter_plot_points  # For backwards compatibility with the template
     
     return render(request, 'core/chapter_form.html', {
-        'project': project,
-        'chapter': chapter,
+        'project': project, 
+        'chapter': chapter, 
         'action': 'Edit',
         'characters': characters,
         'places': places,
         'organizations': organizations,
         'all_plot_points': all_plot_points,
-        'chapter_plot_points': chapter_plot_points,
-        'plot_points': plot_points
+        'chapter_plot_points': chapter_plot_points
     })
 
 @login_required

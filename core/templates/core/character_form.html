@@ -22,7 +22,7 @@
             
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}">Description *</label>
-                <div class="bio-container">
+                <div>
                     {{ form.description }}
                     {% if character %}
                     <button type="button" id="improve-bio" class="btn" data-project-id="{{ project.id }}" data-character-id="{{ character.id }}">

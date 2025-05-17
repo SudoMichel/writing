@@ -312,6 +312,7 @@ def plotpoint_list(request, project_id):
     return render(request, 'core/plotpoint_list.html', {
         'project': project,
         'plot_points': plot_points,
+        'trunc': 120,
     })
 
 @login_required
@@ -461,6 +462,7 @@ def chapter_list(request, project_id):
     return render(request, 'core/chapter_list.html', {
         'project': project,
         'chapters': chapters,
+        'trunc': 120,
     })
 
 @login_required

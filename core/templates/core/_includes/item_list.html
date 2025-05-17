@@ -45,6 +45,11 @@
                     <span class="chapter-number">Chapter {{ item.chapter_number }}</span>
                 </div>
                 <p>{{ item.content|truncatewords_var:trunc }}</p>
+                {% if item.notes %}
+                    <div class="item-notes">
+                        <strong>Notes:</strong> {{ item.notes|truncatewords_var:trunc }}
+                    </div>
+                {% endif %}
                 <div class="item-relations">
                     {% if item.point_of_view %}
                         <span class="relation-tag">POV: {{ item.point_of_view.name }}</span>

@@ -19,7 +19,7 @@
             
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}">Description</label>
-                <div class="description-container">
+                <div>
                     {{ form.description }}
                     {% if organization %}
                     <button type="button" id="improve-organization" class="btn" data-project-id="{{ project.id }}" data-organization-id="{{ organization.id }}">

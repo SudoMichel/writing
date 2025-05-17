@@ -10,34 +10,7 @@
     {% if plot_points %}
         <div class="items-list">
             {% for plot_point in plot_points %}
-                <div class="item-list">
-                    <div class="item-content">
-                        <h3>{{ plot_point.order }}. {{ plot_point.title }}</h3>
-                        <div class="item-body">
-                            <p>{{ plot_point.description }}</p>
-                            
-                            {% if plot_point.characters.all or plot_point.places.all or plot_point.organizations.all %}
-                                <div class="item-relations">
-                                    {% if plot_point.characters.all %}
-                                        <span class="relation-tag">Characters: {{ plot_point.characters.all|join:", " }}</span>
-                                    {% endif %}
-                                    
-                                    {% if plot_point.places.all %}
-                                        <span class="relation-tag">Places: {{ plot_point.places.all|join:", " }}</span>
-                                    {% endif %}
-                                    
-                                    {% if plot_point.organizations.all %}
-                                        <span class="relation-tag">Organizations: {{ plot_point.organizations.all|join:", " }}</span>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="item-actions">
-                        <a href="{% url 'plotpoint_edit' project.id plot_point.id %}" class="btn">Edit</a>
-                        <a href="{% url 'plotpoint_delete' project.id plot_point.id %}" class="btn">Delete</a>
-                    </div>
-                </div>
+                {% include "core/_includes/item_list.html" with item=plot_point item_type='plot_point' project_id=project.id edit_url_name='plotpoint_edit' delete_url_name='plotpoint_delete' %}
             {% endfor %}
         </div>
     {% else %}

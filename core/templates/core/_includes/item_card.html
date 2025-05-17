@@ -13,7 +13,7 @@
     {% elif item_type == 'place' %}
         <p class="item-type">{{ item.type }}</p>
         <div class="item-body">
-            <p>{{ item.description|truncatewords:20 }}</p>
+            <p>{{ item.description|truncatewords_var:trunc }}</p>
             {% if item.characters.all %}
                 <p class="relation-tag">{{ item.characters.all|join:", " }}</p>
             {% endif %}

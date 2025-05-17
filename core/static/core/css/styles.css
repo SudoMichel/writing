@@ -322,3 +322,36 @@ a {
         margin-top: 0.5rem;
     }
 }
+
+/* Project Context Page Styles
+-------------------------------------------------- */
+.project-context-container { /* Renamed to avoid conflict if base has .container */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 20px; /* Add margin if not covered by base template structure */
+}
+.project-context-container h1,
+.project-context-container h2,
+.project-context-container h3 {
+    color: #555;
+}
+.project-context-container pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.project-context-container .section {
+    margin-bottom: 20px;
+}
+.project-context-container .section h2 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+.project-context-container .error {
+    color: red;
+    font-weight: bold;
+}

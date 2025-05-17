@@ -1,0 +1,166 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Project Context{% endblock %}
+
+{% block content %}
+
+<div class="project-context-container">
+    <h1>Project Context Details</h1>
+
+    {% if error_message %}
+        <div class="section error">
+            <h2>Error</h2>
+            <p>{{ error_message }}</p>
+        </div>
+    {% endif %}
+
+    {% if raw_data %}
+        <div class="section">
+            <h2>Project: {{ raw_data.project.name }}</h2>
+            <p><strong>Description:</strong> {{ raw_data.project.description }}</p>
+        </div>
+
+        <div class="section">
+            <h3>Characters</h3>
+            {% if raw_data.project.characters %}
+                <ul>
+                    {% for char in raw_data.project.characters %}
+                        <li>
+                            <strong>{{ char.name }} ({{ char.role }})</strong>
+                            <p>{{ char.description }}</p>
+                            <p><em>Traits:</em> {{ char.traits }}</p>
+                            {% if char.relationships %}
+                                <p><em>Relationships:</em></p>
+                                <ul>
+                                    {% for rel in char.relationships %}
+                                        <li>To {{ rel.to_character }}: {{ rel.description }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No characters found.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Plot Points</h3>
+            {% if raw_data.project.plot_points %}
+                <ul>
+                    {% for plot in raw_data.project.plot_points %}
+                        <li>
+                            <strong>{{ plot.title }} (Order: {{ plot.order }})</strong>
+                            <p>{{ plot.description }}</p>
+                            <p><em>Characters:</em> {{ plot.characters|join:", " }}</p>
+                            <p><em>Places:</em> {{ plot.places|join:", " }}</p>
+                            <p><em>Organizations:</em> {{ plot.organizations|join:", " }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No plot points found.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Places</h3>
+            {% if raw_data.project.places %}
+                <ul>
+                    {% for place in raw_data.project.places %}
+                        <li>
+                            <strong>{{ place.name }} ({{ place.type }})</strong>
+                            <p>{{ place.description }}</p>
+                            <p><em>Characters:</em> {{ place.characters|join:", " }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No places found.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Organizations</h3>
+            {% if raw_data.project.organizations %}
+                <ul>
+                    {% for org in raw_data.project.organizations %}
+                        <li>
+                            <strong>{{ org.name }} ({{ org.type }})</strong>
+                            <p>{{ org.description }}</p>
+                            <p><em>Characters:</em> {{ org.characters|join:", " }}</p>
+                            <p><em>Places:</em> {{ org.places|join:", " }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No organizations found.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Chapters</h3>
+            {% if raw_data.project.chapters %}
+                <ul>
+                    {% for chapter in raw_data.project.chapters %}
+                        <li>
+                            <strong>{{ chapter.title }} (Chapter {{ chapter.chapter_number }})</strong>
+                            <p><em>Notes:</em> {{ chapter.notes|default:"N/A" }}</p>
+                            <p><em>Content:</em></p>
+                            <pre>{{ chapter.content|default:"N/A" }}</pre>
+                            <p><em>Point of View:</em> {{ chapter.point_of_view|default:"N/A" }}</p>
+                            {% if chapter.characters %}
+                                <p><em>Characters:</em> {{ chapter.characters|join:", " }}</p>
+                            {% endif %}
+                            {% if chapter.places %}
+                                <p><em>Places:</em> {{ chapter.places|join:", " }}</p>
+                            {% endif %}
+                            {% if chapter.organizations %}
+                                <p><em>Organizations:</em> {{ chapter.organizations|join:", " }}</p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No chapters found.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Research Notes</h3>
+            {% if raw_data.project.research_notes %}
+                <ul>
+                    {% for note in raw_data.project.research_notes %}
+                        <li>
+                            <strong>{{ note.title }}</strong>
+                            <p><em>Content:</em></p>
+                            <pre>{{ note.content|default:"N/A" }}</pre>
+                            <p><em>Tags:</em> {{ note.tags|default:"N/A" }}</p>
+                            <p><em>File:</em> {{ note.file_name|default:"N/A" }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No research notes found.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>LLM Context</h2>
+            <button id="copy-llm-context-btn" class="btn btn-secondary">Copy JSON</button>
+        </div>
+        {% if llm_context %}
+            <pre id="llm-context-pre">{{ llm_context }}</pre>
+        {% else %}
+            <p>No LLM context available.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<script src="{% static 'ai/js/project_context.js' %}"></script>
+{% endblock %} 

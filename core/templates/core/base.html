@@ -13,6 +13,7 @@
         <a href="{% url 'home' %}">Home</a>
         {% if user.is_authenticated %}
             <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'ai:project_context' project_id=1 %}">Project Context</a>
         {% else %}
             <a href="{% url 'login' %}">Login</a>
             <a href="{% url 'register' %}">Register</a>

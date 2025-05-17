@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 import os
 from django.http import JsonResponse
-from core.models import Project, Character, PlotPoint, Place, Organization
+from core.models import Project, Character, PlotPoint, Place, Organization, Chapter, ResearchNote
 import json
 from .llm_utils import generate_llm_response
 from .prompts import CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT, ORG_DESCRIPTION_PROMPT, PROJECT_SUMMARY_PROMPT
@@ -16,7 +16,9 @@ def get_project_context(project):
             'characters': [],
             'plot_points': [],
             'places': [],
-            'organizations': []
+            'organizations': [],
+            'chapters': [],
+            'research_notes': []
         }
     }
     
@@ -39,6 +41,20 @@ def get_project_context(project):
         
         context_data['project']['characters'].append(char_data)
     
+    # Add chapters
+    for chapter_obj in project.chapters.all():
+        chapter_data = {
+            'title': chapter_obj.title,
+            'chapter_number': chapter_obj.chapter_number,
+            'notes': chapter_obj.notes,
+            'content': chapter_obj.content,
+            'point_of_view': chapter_obj.point_of_view.name if chapter_obj.point_of_view else None,
+            'characters': [char.name for char in chapter_obj.characters.all()],
+            'places': [place.name for place in chapter_obj.places.all()],
+            'organizations': [org.name for org in chapter_obj.organizations.all()]
+        }
+        context_data['project']['chapters'].append(chapter_data)
+    
     # Add plot points
     for plot_point in project.plot_points.all():
         plot_data = {
@@ -47,7 +63,8 @@ def get_project_context(project):
             'order': plot_point.order,
             'characters': [char.name for char in plot_point.characters.all()],
             'places': [place.name for place in plot_point.places.all()],
-            'organizations': [org.name for org in plot_point.organizations.all()]
+            'organizations': [org.name for org in plot_point.organizations.all()],
+            'chapter_title': plot_point.chapter.title if plot_point.chapter else None
         }
         context_data['project']['plot_points'].append(plot_data)
     
@@ -71,21 +88,37 @@ def get_project_context(project):
         }
         context_data['project']['organizations'].append(org_data)
     
+    # Add research notes
+    for note in project.research_notes.all():
+        note_data = {
+            'title': note.title,
+            'content': note.content,
+            'tags': note.tags,
+            'file_name': note.file.name if note.file else None
+        }
+        context_data['project']['research_notes'].append(note_data)
+    
     # Format the context for the LLM
     llm_context = f"""Project: {context_data['project']['name']}
 Description: {context_data['project']['description']}
 
 Characters:
-{json.dumps(context_data['project']['characters'], indent=2)}
+{json.dumps(context_data['project']['characters'], indent=2, ensure_ascii=False)}
 
 Plot Points:
-{json.dumps(context_data['project']['plot_points'], indent=2)}
+{json.dumps(context_data['project']['plot_points'], indent=2, ensure_ascii=False)}
 
 Places:
-{json.dumps(context_data['project']['places'], indent=2)}
+{json.dumps(context_data['project']['places'], indent=2, ensure_ascii=False)}
 
 Organizations:
-{json.dumps(context_data['project']['organizations'], indent=2)}
+{json.dumps(context_data['project']['organizations'], indent=2, ensure_ascii=False)}
+
+Chapters:
+{json.dumps(context_data['project']['chapters'], indent=2, ensure_ascii=False)}
+
+Research Notes:
+{json.dumps(context_data['project']['research_notes'], indent=2, ensure_ascii=False)}
 """
     
     return context_data, llm_context
@@ -107,13 +140,12 @@ def test_api_key(request):
     })
 
 @require_api_key
-def test_project_context(request, project_id):
+def project_context(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     context_data, llm_context = get_project_context(project)
-    return JsonResponse({
-        'status': 'success',
-        'context': llm_context,
-        'raw_data': context_data
+    return render(request, 'ai/project_context.html', {
+        'raw_data': context_data,
+        'llm_context': llm_context
     })
 
 @require_api_key

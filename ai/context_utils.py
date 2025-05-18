@@ -124,42 +124,10 @@ def get_project_context(project):
         }
         context_data['project']['research_notes'].append(note_data)
     
-    # Format the context for the LLM
-    llm_context_parts = [
-        f"Project: {context_data['project']['name']}",
-        f"Description: {context_data['project']['description']}",
-        f"Core Premise: {context_data['project']['core_premise'] if context_data['project']['core_premise'] else 'Not specified'}",
-        f"Key Themes: {context_data['project']['key_themes'] if context_data['project']['key_themes'] else 'Not specified'}",
-        f"Genre: {context_data['project']['genre'] if context_data['project']['genre'] else 'Not specified'}",
-        f"Style: {context_data['project']['style'] if context_data['project']['style'] else 'Not specified'}"
-    ]
-
-    if context_data['project']['characters']:
-        llm_context_parts.append("\nCharacters:")
-        llm_context_parts.append(json.dumps(context_data['project']['characters'], indent=2, ensure_ascii=False))
-
-    if context_data['project']['plot_points']:
-        llm_context_parts.append("\nPlot Points:")
-        llm_context_parts.append(json.dumps(context_data['project']['plot_points'], indent=2, ensure_ascii=False))
-
-    if context_data['project']['places']:
-        llm_context_parts.append("\nPlaces:")
-        llm_context_parts.append(json.dumps(context_data['project']['places'], indent=2, ensure_ascii=False))
-
-    if context_data['project']['organizations']:
-        llm_context_parts.append("\nOrganizations:")
-        llm_context_parts.append(json.dumps(context_data['project']['organizations'], indent=2, ensure_ascii=False))
-
-    if context_data['project']['chapters']:
-        llm_context_parts.append("\nChapters:")
-        llm_context_parts.append(json.dumps(context_data['project']['chapters'], indent=2, ensure_ascii=False))
-
-    if context_data['project']['research_notes']:
-        llm_context_parts.append("\nResearch Notes:")
-        llm_context_parts.append(json.dumps(context_data['project']['research_notes'], indent=2, ensure_ascii=False))
-    
-    llm_context = "\n".join(llm_context_parts)
-    if llm_context_parts: # Add a final newline if there's any content
-        llm_context += "\n"
+    # Format the llm_context as a valid JSON string.
+    # The context_data['project'] dictionary now contains all project details,
+    # including characters, plot points, etc., as nested Python structures.
+    # We serialize this entire dictionary into a single JSON string.
+    llm_context = json.dumps(context_data['project'], indent=2, ensure_ascii=False)
             
     return context_data, llm_context 

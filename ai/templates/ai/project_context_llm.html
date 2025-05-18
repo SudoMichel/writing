@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}LLM Context - {{ project_name }}{% endblock %}
+
+{% block content %}
+<div class="project-context-container">
+    <h1>LLM Context: {{ project_name }}</h1>
+
+    <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>LLM Context (JSON)</h2>
+            <button id="copy-llm-context-btn" class="btn btn-secondary">Copy JSON</button>
+        </div>
+        {% if llm_context %}
+            <pre id="llm-context-pre">{{ llm_context }}</pre>
+        {% else %}
+            <p>No LLM context available for this project.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<script src="{% static 'ai/js/project_context.js' %}"></script>
+{% endblock %} 

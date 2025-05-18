@@ -1,12 +1,12 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Project Context{% endblock %}
+{% block title %}Project Details - {{ project_name }}{% endblock %}
 
 {% block content %}
 
 <div class="project-context-container">
-    <h1>Project Context Details</h1>
+    <h1>Project Details: {{ project_name }}</h1>
 
     {% if error_message %}
         <div class="section error">
@@ -146,21 +146,8 @@
                 <p>No research notes found.</p>
             {% endif %}
         </div>
+    {% else %}
+        <p>No data available for this project.</p>
     {% endif %}
-
-    <div class="section">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>LLM Context</h2>
-            <button id="copy-llm-context-btn" class="btn btn-secondary">Copy JSON</button>
-        </div>
-        {% if llm_context %}
-            <pre id="llm-context-pre">{{ llm_context }}</pre>
-        {% else %}
-            <p>No LLM context available.</p>
-        {% endif %}
-    </div>
-
 </div>
-
-<script src="{% static 'ai/js/project_context.js' %}"></script>
 {% endblock %} 

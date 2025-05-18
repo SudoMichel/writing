@@ -9,6 +9,49 @@ from .prompts import (CHARACTER_BIO_PROMPT, PLACE_DESCRIPTION_PROMPT,
 from .context_utils import get_project_context
 import json
 
+ENTITY_CONFIGURATIONS = {
+    'character': {
+        'model': Character,
+        'prompt_template': CHARACTER_BIO_PROMPT,
+        'prompt_args_fn': lambda entity: {'name': entity.name, 'description': entity.description},
+        'response_key': 'improved_bio'
+    },
+    'place': {
+        'model': Place,
+        'prompt_template': PLACE_DESCRIPTION_PROMPT,
+        'prompt_args_fn': lambda entity: {'name': entity.name, 'description': entity.description},
+        'response_key': 'improved_description'
+    },
+    'organization': {
+        'model': Organization,
+        'prompt_template': ORG_DESCRIPTION_PROMPT,
+        'prompt_args_fn': lambda entity: {'name': entity.name, 'org_type': entity.type, 'description': entity.description},
+        'response_key': 'improved_description'
+    },
+    'chapter': {
+        'model': Chapter,
+        'prompt_template': CHAPTER_CONTENT_PROMPT,
+        'prompt_args_fn': lambda entity: {
+            'chapter_title': entity.title or "Untitled",
+            'chapter_number': entity.chapter_number or "N/A",
+            'point_of_view_character': entity.point_of_view.name if entity.point_of_view else "Not specified",
+            'chapter_notes': entity.notes or "None",
+        },
+        'response_key': 'generated_content'
+    }
+}
+
+def _get_entity_config_and_instance(entity_type, entity_id, project):
+    config = ENTITY_CONFIGURATIONS.get(entity_type)
+    if not config:
+        return None, None, None, None, JsonResponse({'status': 'error', 'message': 'Invalid entity type'}, status=400)
+
+    entity = get_object_or_404(config['model'], pk=entity_id, project=project)
+    prompt_template = config['prompt_template']
+    prompt_args = config['prompt_args_fn'](entity)
+    response_key = config['response_key']
+    
+    return entity, prompt_template, prompt_args, response_key, None
 
 def require_api_key(view_func):
     def wrapper(request, *args, **kwargs):
@@ -27,11 +70,20 @@ def test_api_key(request):
     })
 
 @require_api_key
-def project_context(request, project_id):
+def view_project_context_html(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
-    context_data, llm_context = get_project_context(project)
-    return render(request, 'ai/project_context.html', {
-        'raw_data': context_data,
+    context_data, _ = get_project_context(project) # We only need raw_data for this view
+    return render(request, 'ai/project_context_display.html', {
+        'project_name': project.name, # Pass project name for the title or breadcrumbs
+        'raw_data': context_data
+    })
+
+@require_api_key
+def view_project_context_llm(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    _, llm_context = get_project_context(project) # We only need llm_context for this view
+    return render(request, 'ai/project_context_llm.html', {
+        'project_name': project.name, # Pass project name for the title or breadcrumbs
         'llm_context': llm_context
     })
 
@@ -40,38 +92,14 @@ def improve_entity_description(request, project_id, entity_type, entity_id):
     project = get_object_or_404(Project, pk=project_id)
     _, llm_context = get_project_context(project)
 
-    prompt_template = None
-    entity = None
-    prompt_args = {}
-    response_key = 'improved_description'  # default
+    entity, prompt_template, prompt_args, response_key, error_response = \
+        _get_entity_config_and_instance(entity_type, entity_id, project)
 
-    if entity_type == 'character':
-        entity = get_object_or_404(Character, pk=entity_id, project=project)
-        prompt_template = CHARACTER_BIO_PROMPT
-        prompt_args = {'name': entity.name, 'description': entity.description}
-        response_key = 'improved_bio'
-    elif entity_type == 'place':
-        entity = get_object_or_404(Place, pk=entity_id, project=project)
-        prompt_template = PLACE_DESCRIPTION_PROMPT
-        prompt_args = {'name': entity.name, 'description': entity.description}
-        response_key = 'improved_description'
-    elif entity_type == 'organization':
-        entity = get_object_or_404(Organization, pk=entity_id, project=project)
-        prompt_template = ORG_DESCRIPTION_PROMPT
-        prompt_args = {'name': entity.name, 'org_type': entity.type, 'description': entity.description}
-        response_key = 'improved_description'
-    elif entity_type == 'chapter':
-        entity = get_object_or_404(Chapter, pk=entity_id, project=project)
-        prompt_template = CHAPTER_CONTENT_PROMPT
-        prompt_args = {
-            'chapter_title': entity.title or "Untitled",
-            'chapter_number': entity.chapter_number or "N/A",
-            'point_of_view_character': entity.point_of_view.name if entity.point_of_view else "Not specified",
-            'chapter_notes': entity.notes or "None",
-        }
-        response_key = 'generated_content'
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid entity type'}, status=400)
+    if error_response:
+        return error_response
+    
+    if not entity: 
+        return JsonResponse({'status': 'error', 'message': f'{entity_type.capitalize()} not found.'}, status=404)
 
     if request.method == 'GET':
         final_prompt_args = {**prompt_args, 'llm_context': llm_context}

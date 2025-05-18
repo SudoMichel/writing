@@ -58,6 +58,8 @@ Please provide an improved organization description that:
 
 # Chapter content prompt
 CHAPTER_CONTENT_PROMPT = '''Write the content for Chapter {chapter_number}: {chapter_title}
+Be consistent with existing information and maintain a literary quality.
+Write plain text with no comments, explanations, or JSON formatting.
 
 POV Character: {point_of_view_character}
 Chapter Notes: {chapter_notes}
@@ -67,4 +69,4 @@ Be consistent with existing characters, plot progression, and tone.
 Provide only the chapter content without comments or explanations. No chapter title, chapter number, or chapter notes.
 
 Relevant project context:
-{llm_context}''' 
+{llm_context}'''

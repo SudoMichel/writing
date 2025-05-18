@@ -1,5 +1,4 @@
 import json
-from core.models import Project, Character, PlotPoint, Place, Organization, Chapter, ResearchNote # Ensure all used models are imported
 
 def get_project_context(project):
     """Get the full context of a project including all related data."""
@@ -18,26 +17,26 @@ def get_project_context(project):
         }
     }
     
-    # Add characters
     for character in project.characters.all():
         char_data = {
             'name': character.name,
             'role': character.role,
             'description': character.description,
-            'traits': character.traits,
-            'relationships': []
+            'traits': character.traits
+            # 'relationships' will be added conditionally
         }
         
-        # Add relationships
+        relationships_list = []
         for rel in character.relationships_from.all():
-            char_data['relationships'].append({
+            relationships_list.append({
                 'to_character': rel.to_character.name,
                 'description': rel.description
             })
+        if relationships_list:
+            char_data['relationships'] = relationships_list
         
         context_data['project']['characters'].append(char_data)
     
-    # Add chapters
     for chapter_obj in project.chapters.all():
         chapter_data = {
             'title': chapter_obj.title,
@@ -45,78 +44,112 @@ def get_project_context(project):
             'notes': chapter_obj.notes,
             'content': chapter_obj.content,
             'point_of_view': chapter_obj.point_of_view.name if chapter_obj.point_of_view else None,
-            'characters': [char.name for char in chapter_obj.characters.all()],
-            'places': [place.name for place in chapter_obj.places.all()],
-            'organizations': [org.name for org in chapter_obj.organizations.all()]
         }
+        chap_chars = [char.name for char in chapter_obj.characters.all()]
+        if chap_chars:
+            chapter_data['characters'] = chap_chars
+        
+        chap_places = [place.name for place in chapter_obj.places.all()]
+        if chap_places:
+            chapter_data['places'] = chap_places
+            
+        chap_orgs = [org.name for org in chapter_obj.organizations.all()]
+        if chap_orgs:
+            chapter_data['organizations'] = chap_orgs
+            
         context_data['project']['chapters'].append(chapter_data)
     
-    # Add plot points
     for plot_point in project.plot_points.all():
         plot_data = {
             'title': plot_point.title,
             'description': plot_point.description,
             'order': plot_point.order,
-            'characters': [char.name for char in plot_point.characters.all()],
-            'places': [place.name for place in plot_point.places.all()],
-            'organizations': [org.name for org in plot_point.organizations.all()],
             'chapter_title': plot_point.chapter.title if plot_point.chapter else None
         }
+        plot_chars = [char.name for char in plot_point.characters.all()]
+        if plot_chars:
+            plot_data['characters'] = plot_chars
+        
+        plot_places = [place.name for place in plot_point.places.all()]
+        if plot_places:
+            plot_data['places'] = plot_places
+            
+        plot_orgs = [org.name for org in plot_point.organizations.all()]
+        if plot_orgs:
+            plot_data['organizations'] = plot_orgs
+            
         context_data['project']['plot_points'].append(plot_data)
     
-    # Add places
     for place in project.places.all():
-        context_data['project']['places'].append({
+        place_entry = {
             'name': place.name,
             'type': place.type,
             'description': place.description,
-            'characters': [char.name for char in place.characters.all()]
-        })
+        }
+        place_chars = [char.name for char in place.characters.all()]
+        if place_chars:
+            place_entry['characters'] = place_chars
+        context_data['project']['places'].append(place_entry)
     
-    # Add organizations
     for org in project.organizations.all():
         org_data = {
             'name': org.name,
             'type': org.type,
             'description': org.description,
-            'characters': [char.name for char in org.characters.all()],
-            'places': [place.name for place in org.places.all()]
         }
+        org_chars = [char.name for char in org.characters.all()]
+        if org_chars:
+            org_data['characters'] = org_chars
+        
+        org_places = [place.name for place in org.places.all()]
+        if org_places:
+            org_data['places'] = org_places
+            
         context_data['project']['organizations'].append(org_data)
     
-    # Add research notes
     for note in project.research_notes.all():
         note_data = {
             'title': note.title,
             'content': note.content,
-            'tags': note.tags,
+            'tags': note.tags, # Assuming tags is handled appropriately by the model or not a list needing conditional add here
             'file_name': note.file.name if note.file else None
         }
         context_data['project']['research_notes'].append(note_data)
     
     # Format the context for the LLM
-    llm_context = f"""Project: {context_data['project']['name']}
-Description: {context_data['project']['description']}
-Genre: {context_data['project']['genre'] if context_data['project']['genre'] else 'Not specified'}
-Style: {context_data['project']['style'] if context_data['project']['style'] else 'Not specified'}
+    llm_context_parts = [
+        f"Project: {context_data['project']['name']}",
+        f"Description: {context_data['project']['description']}",
+        f"Genre: {context_data['project']['genre'] if context_data['project']['genre'] else 'Not specified'}",
+        f"Style: {context_data['project']['style'] if context_data['project']['style'] else 'Not specified'}"
+    ]
 
-Characters:
-{json.dumps(context_data['project']['characters'], indent=2, ensure_ascii=False)}
+    if context_data['project']['characters']:
+        llm_context_parts.append("\nCharacters:")
+        llm_context_parts.append(json.dumps(context_data['project']['characters'], indent=2, ensure_ascii=False))
 
-Plot Points:
-{json.dumps(context_data['project']['plot_points'], indent=2, ensure_ascii=False)}
+    if context_data['project']['plot_points']:
+        llm_context_parts.append("\nPlot Points:")
+        llm_context_parts.append(json.dumps(context_data['project']['plot_points'], indent=2, ensure_ascii=False))
 
-Places:
-{json.dumps(context_data['project']['places'], indent=2, ensure_ascii=False)}
+    if context_data['project']['places']:
+        llm_context_parts.append("\nPlaces:")
+        llm_context_parts.append(json.dumps(context_data['project']['places'], indent=2, ensure_ascii=False))
 
-Organizations:
-{json.dumps(context_data['project']['organizations'], indent=2, ensure_ascii=False)}
+    if context_data['project']['organizations']:
+        llm_context_parts.append("\nOrganizations:")
+        llm_context_parts.append(json.dumps(context_data['project']['organizations'], indent=2, ensure_ascii=False))
 
-Chapters:
-{json.dumps(context_data['project']['chapters'], indent=2, ensure_ascii=False)}
+    if context_data['project']['chapters']:
+        llm_context_parts.append("\nChapters:")
+        llm_context_parts.append(json.dumps(context_data['project']['chapters'], indent=2, ensure_ascii=False))
 
-Research Notes:
-{json.dumps(context_data['project']['research_notes'], indent=2, ensure_ascii=False)}
-"""
+    if context_data['project']['research_notes']:
+        llm_context_parts.append("\nResearch Notes:")
+        llm_context_parts.append(json.dumps(context_data['project']['research_notes'], indent=2, ensure_ascii=False))
     
+    llm_context = "\n".join(llm_context_parts)
+    if llm_context_parts: # Add a final newline if there's any content
+        llm_context += "\n"
+            
     return context_data, llm_context 

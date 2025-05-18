@@ -100,6 +100,10 @@
                         <li>
                             <strong>{{ place.name }} ({{ place.type }})</strong>
                             <p>{{ place.description }}</p>
+                            <p><em>Summary:</em> {{ place.summary|default:"N/A" }}</p>
+                            <p><em>Sensory Details:</em> {{ place.sensory_details_keywords|default:"N/A" }}</p>
+                            <p><em>Atmosphere:</em> {{ place.atmosphere_keywords|default:"N/A" }}</p>
+                            <p><em>Strategic Importance/Plot Relevance:</em> {{ place.strategic_importance_or_plot_relevance|default:"N/A" }}</p>
                             <p><em>Characters:</em> {{ place.characters|join:", " }}</p>
                         </li>
                     {% endfor %}
@@ -117,6 +121,10 @@
                         <li>
                             <strong>{{ org.name }} ({{ org.type }})</strong>
                             <p>{{ org.description }}</p>
+                            <p><em>Goals and Objectives:</em> {{ org.goals_and_objectives|default:"N/A" }}</p>
+                            <p><em>Modus Operandi Keywords:</em> {{ org.modus_operandi_keywords|default:"N/A" }}</p>
+                            <p><em>Hierarchy and Membership:</em> {{ org.hierarchy_and_membership|default:"N/A" }}</p>
+                            <p><em>Relationships with other Entities:</em> {{ org.relationships_with_other_entities|default:"N/A" }}</p>
                             <p><em>Characters:</em> {{ org.characters|join:", " }}</p>
                             <p><em>Places:</em> {{ org.places|join:", " }}</p>
                         </li>

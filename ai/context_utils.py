@@ -26,7 +26,9 @@ def get_project_context(project):
             'description': character.description,
         }
         if character.traits:
-            char_data['traits'] = character.traits
+            keywords = [keyword.strip() for keyword in character.traits.split(';') if keyword.strip()]
+            if keywords:
+                char_data['traits'] = keywords
         if character.appearance:
             char_data['appearance'] = character.appearance
         if character.age:
@@ -37,19 +39,25 @@ def get_project_context(project):
         if character.primary_goal:
             char_data['primary_goal'] = character.primary_goal
         if character.secondary_goals:
-            char_data['secondary_goals'] = character.secondary_goals
+            keywords = [keyword.strip() for keyword in character.secondary_goals.split(';') if keyword.strip()]
+            if keywords: char_data['secondary_goals'] = keywords
         if character.key_motivations:
-            char_data['key_motivations'] = character.key_motivations
+            keywords = [keyword.strip() for keyword in character.key_motivations.split(';') if keyword.strip()]
+            if keywords: char_data['key_motivations'] = keywords
         if character.character_arc_summary:
             char_data['character_arc_summary'] = character.character_arc_summary
         if character.strengths:
-            char_data['strengths'] = character.strengths
+            keywords = [keyword.strip() for keyword in character.strengths.split(';') if keyword.strip()]
+            if keywords: char_data['strengths'] = keywords
         if character.weaknesses:
-            char_data['weaknesses'] = character.weaknesses
+            keywords = [keyword.strip() for keyword in character.weaknesses.split(';') if keyword.strip()]
+            if keywords: char_data['weaknesses'] = keywords
         if character.internal_conflict:
-            char_data['internal_conflict'] = character.internal_conflict
+            keywords = [keyword.strip() for keyword in character.internal_conflict.split(';') if keyword.strip()]
+            if keywords: char_data['internal_conflict'] = keywords
         if character.external_conflict:
-            char_data['external_conflict'] = character.external_conflict
+            keywords = [keyword.strip() for keyword in character.external_conflict.split(';') if keyword.strip()]
+            if keywords: char_data['external_conflict'] = keywords
         
         relationships_list = []
         for rel in character.relationships_from.all():
@@ -88,17 +96,21 @@ def get_project_context(project):
         plot_data = {
             'order': plot_point.order,
             'title': plot_point.title,
-            'narrative_function': plot_point.narrative_function,
+            'narrative_function': [kw.strip() for kw in plot_point.narrative_function.split(';') if kw.strip()] if plot_point.narrative_function else None,
             'chapter_title': plot_point.chapter.title if plot_point.chapter else None
         }
         if plot_point.key_events:
-            plot_data['key_events'] = plot_point.key_events
+            keywords = [keyword.strip() for keyword in plot_point.key_events.split(';') if keyword.strip()]
+            if keywords: plot_data['key_events'] = keywords
         if plot_point.information_revealed_to_reader:
-            plot_data['information_revealed_to_reader'] = plot_point.information_revealed_to_reader
+            keywords = [keyword.strip() for keyword in plot_point.information_revealed_to_reader.split(';') if keyword.strip()]
+            if keywords: plot_data['information_revealed_to_reader'] = keywords
         if plot_point.character_development_achieved:
-            plot_data['character_development_achieved'] = plot_point.character_development_achieved
+            keywords = [keyword.strip() for keyword in plot_point.character_development_achieved.split(';') if keyword.strip()]
+            if keywords: plot_data['character_development_achieved'] = keywords
         if plot_point.conflict_introduced_or_escalated:
-            plot_data['conflict_introduced_or_escalated'] = plot_point.conflict_introduced_or_escalated
+            keywords = [keyword.strip() for keyword in plot_point.conflict_introduced_or_escalated.split(';') if keyword.strip()]
+            if keywords: plot_data['conflict_introduced_or_escalated'] = keywords
 
         plot_chars = [char.name for char in plot_point.characters.all()]
         if plot_chars:
@@ -120,6 +132,19 @@ def get_project_context(project):
             'type': place.type,
             'description': place.description,
         }
+        if place.summary:
+            place_entry['summary'] = place.summary
+        if place.sensory_details_keywords:
+            keywords = [keyword.strip() for keyword in place.sensory_details_keywords.split(';') if keyword.strip()]
+            if keywords:
+                place_entry['sensory_details_keywords'] = keywords
+        if place.atmosphere_keywords:
+            keywords = [keyword.strip() for keyword in place.atmosphere_keywords.split(';') if keyword.strip()]
+            if keywords: place_entry['atmosphere_keywords'] = keywords
+        if place.strategic_importance_or_plot_relevance:
+            keywords = [keyword.strip() for keyword in place.strategic_importance_or_plot_relevance.split(';') if keyword.strip()]
+            if keywords: place_entry['strategic_importance_or_plot_relevance'] = keywords
+
         place_chars = [char.name for char in place.characters.all()]
         if place_chars:
             place_entry['characters'] = place_chars
@@ -131,6 +156,19 @@ def get_project_context(project):
             'type': org.type,
             'description': org.description,
         }
+        if org.goals_and_objectives:
+            keywords = [keyword.strip() for keyword in org.goals_and_objectives.split(';') if keyword.strip()]
+            if keywords: org_data['goals_and_objectives'] = keywords
+        if org.modus_operandi_keywords:
+            keywords = [keyword.strip() for keyword in org.modus_operandi_keywords.split(';') if keyword.strip()]
+            if keywords: org_data['modus_operandi_keywords'] = keywords
+        if org.hierarchy_and_membership:
+            keywords = [keyword.strip() for keyword in org.hierarchy_and_membership.split(';') if keyword.strip()]
+            if keywords: org_data['hierarchy_and_membership'] = keywords
+        if org.relationships_with_other_entities:
+            keywords = [keyword.strip() for keyword in org.relationships_with_other_entities.split(';') if keyword.strip()]
+            if keywords: org_data['relationships_with_other_entities'] = keywords
+
         org_chars = [char.name for char in org.characters.all()]
         if org_chars:
             org_data['characters'] = org_chars

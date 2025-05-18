@@ -31,6 +31,30 @@
                 </div>
                 <div id="improvement-status" class="improvement-status"></div>
             </div>
+
+            <div class="form-group">
+                <label for="{{ form.summary.id_for_label }}">Summary</label>
+                {{ form.summary }}
+                <p class="help-text">{{ form.summary.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.sensory_details_keywords.id_for_label }}">Sensory Details Keywords</label>
+                {{ form.sensory_details_keywords }}
+                <p class="help-text">{{ form.sensory_details_keywords.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.atmosphere_keywords.id_for_label }}">Atmosphere Keywords</label>
+                {{ form.atmosphere_keywords }}
+                <p class="help-text">{{ form.atmosphere_keywords.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.strategic_importance_or_plot_relevance.id_for_label }}">Strategic Importance/Plot Relevance</label>
+                {{ form.strategic_importance_or_plot_relevance }}
+                <p class="help-text">{{ form.strategic_importance_or_plot_relevance.help_text }}</p>
+            </div>
         </div>
         
         <div class="form-section">

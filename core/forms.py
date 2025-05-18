@@ -26,16 +26,26 @@ class CharacterForm(forms.ModelForm):
 class PlaceForm(forms.ModelForm):
     class Meta:
         model = Place
-        fields = ['name', 'type', 'description', 'characters']
+        fields = ['name', 'type', 'description', 'summary', 'sensory_details_keywords', 'atmosphere_keywords', 'strategic_importance_or_plot_relevance', 'characters']
         widgets = {
+            'description': forms.Textarea(attrs={'rows': 5}),
+            'summary': forms.Textarea(attrs={'rows': 3}),
+            'sensory_details_keywords': forms.Textarea(attrs={'rows': 3}),
+            'atmosphere_keywords': forms.Textarea(attrs={'rows': 3}),
+            'strategic_importance_or_plot_relevance': forms.Textarea(attrs={'rows': 3}),
             'characters': forms.CheckboxSelectMultiple,
         }
 
 class OrganizationForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = ['name', 'type', 'description', 'characters', 'places']
+        fields = ['name', 'type', 'description', 'goals_and_objectives', 'modus_operandi_keywords', 'hierarchy_and_membership', 'relationships_with_other_entities', 'characters', 'places']
         widgets = {
+            'description': forms.Textarea(attrs={'rows': 5}),
+            'goals_and_objectives': forms.Textarea(attrs={'rows': 3}),
+            'modus_operandi_keywords': forms.Textarea(attrs={'rows': 3}),
+            'hierarchy_and_membership': forms.Textarea(attrs={'rows': 3}),
+            'relationships_with_other_entities': forms.Textarea(attrs={'rows': 3}),
             'characters': forms.CheckboxSelectMultiple,
             'places': forms.CheckboxSelectMultiple,
         }

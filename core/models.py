@@ -33,7 +33,6 @@ class Character(models.Model):
     weaknesses = models.TextField(blank=True, null=True, help_text="Enter weaknesses, separated by semicolons")
     internal_conflict = models.TextField(blank=True, null=True, help_text="Describe internal conflicts, separated by semicolons")
     external_conflict = models.TextField(blank=True, null=True, help_text="Describe external conflicts, separated by semicolons")
-    thumbnail = models.ImageField(upload_to='character_thumbnails/', blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='characters')
     created_at = models.DateTimeField(auto_now_add=True)
 

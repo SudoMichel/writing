@@ -4,9 +4,6 @@
     <h3>{{ item.name }}</h3>
 
     {% if item_type == 'character' %}
-        {% if item.thumbnail %}
-            <img src="{{ item.thumbnail.url }}" alt="{{ item.name }} thumbnail" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
-        {% endif %}
         <p class="item-type">{{ item.role }}</p>
         <div class="item-body">
             <p>{{ item.description|truncatewords_var:trunc }}</p>

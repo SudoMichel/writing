@@ -33,7 +33,7 @@ def project_edit(request, pk):
     return render(request, 'core/project_form.html', {
         'form': form,
         'project': project,
-        'trunc': 30,
+        'trunc': 20,
         'action': 'Save',
         'editing_project_details': False
     })
@@ -81,7 +81,7 @@ def character_list(request, project_id):
 def character_create(request, project_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
     if request.method == 'POST':
-        form = CharacterForm(request.POST, request.FILES)
+        form = CharacterForm(request.POST)
         if form.is_valid():
             character = form.save(commit=False)
             character.project = project
@@ -113,7 +113,7 @@ def character_edit(request, project_id, character_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
     character = get_object_or_404(Character, pk=character_id, project=project)
     if request.method == 'POST':
-        form = CharacterForm(request.POST, request.FILES, instance=character)
+        form = CharacterForm(request.POST, instance=character)
         if form.is_valid():
             character = form.save()
             # Handle relationships

@@ -35,7 +35,10 @@
                         <li>
                             <strong>{{ char.name }} ({{ char.role }})</strong>
                             <p>{{ char.description }}</p>
-                            <p><em>Traits:</em> {{ char.traits }}</p>
+                            <p><em>Traits:</em> {{ char.traits|default:"N/A" }}</p>
+                            <p><em>Appearance:</em> {{ char.appearance|default:"N/A" }}</p>
+                            <p><em>Age:</em> {{ char.age|default:"N/A" }}</p>
+                            <p><em>Gender:</em> {{ char.gender|default:"N/A" }}</p>
                             {% if char.relationships %}
                                 <p><em>Relationships:</em></p>
                                 <ul>

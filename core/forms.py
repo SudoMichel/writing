@@ -9,7 +9,7 @@ class ProjectForm(forms.ModelForm):
 class CharacterForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'role', 'description', 'traits']
+        fields = ['name', 'role', 'description', 'traits', 'appearance', 'age', 'gender']
 
 class PlaceForm(forms.ModelForm):
     class Meta:

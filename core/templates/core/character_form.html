@@ -38,6 +38,21 @@
                 {{ form.traits }}
                 <p class="help-text">Example: Brave, Loyal, Quick-tempered, etc.</p>
             </div>
+
+            <div class="form-group">
+                <label for="{{ form.appearance.id_for_label }}">Appearance</label>
+                {{ form.appearance }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.age.id_for_label }}">Age</label>
+                {{ form.age }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.gender.id_for_label }}">Gender</label>
+                {{ form.gender }}
+            </div>
         </div>
         
         {% if project.characters.count > 1 %}

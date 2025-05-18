@@ -19,7 +19,10 @@ class Character(models.Model):
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=100)
     description = models.TextField()
-    traits = models.TextField(help_text="Enter character traits, separated by commas")
+    traits = models.TextField(help_text="Enter character traits, separated by commas", blank=True, null=True)
+    appearance = models.TextField(blank=True, null=True)
+    age = models.CharField(max_length=50, blank=True, null=True)
+    gender = models.CharField(max_length=50, blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='characters')
     created_at = models.DateTimeField(auto_now_add=True)
 

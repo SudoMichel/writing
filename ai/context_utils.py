@@ -22,9 +22,15 @@ def get_project_context(project):
             'name': character.name,
             'role': character.role,
             'description': character.description,
-            'traits': character.traits
-            # 'relationships' will be added conditionally
         }
+        if character.traits:
+            char_data['traits'] = character.traits
+        if character.appearance:
+            char_data['appearance'] = character.appearance
+        if character.age:
+            char_data['age'] = character.age
+        if character.gender:
+            char_data['gender'] = character.gender
         
         relationships_list = []
         for rel in character.relationships_from.all():

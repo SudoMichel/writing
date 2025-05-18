@@ -168,6 +168,9 @@ def get_project_context(project):
         if org.relationships_with_other_entities:
             keywords = [keyword.strip() for keyword in org.relationships_with_other_entities.split(';') if keyword.strip()]
             if keywords: org_data['relationships_with_other_entities'] = keywords
+        if org.internal_dynamics:
+            keywords = [keyword.strip() for keyword in org.internal_dynamics.split(';') if keyword.strip()]
+            if keywords: org_data['internal_dynamics'] = keywords
 
         org_chars = [char.name for char in org.characters.all()]
         if org_chars:

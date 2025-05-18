@@ -39,13 +39,14 @@ class PlaceForm(forms.ModelForm):
 class OrganizationForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = ['name', 'type', 'description', 'goals_and_objectives', 'modus_operandi_keywords', 'hierarchy_and_membership', 'relationships_with_other_entities', 'characters', 'places']
+        fields = ['name', 'type', 'description', 'goals_and_objectives', 'modus_operandi_keywords', 'hierarchy_and_membership', 'relationships_with_other_entities', 'internal_dynamics', 'characters', 'places']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
             'goals_and_objectives': forms.Textarea(attrs={'rows': 3}),
             'modus_operandi_keywords': forms.Textarea(attrs={'rows': 3}),
             'hierarchy_and_membership': forms.Textarea(attrs={'rows': 3}),
             'relationships_with_other_entities': forms.Textarea(attrs={'rows': 3}),
+            'internal_dynamics': forms.Textarea(attrs={'rows': 3}),
             'characters': forms.CheckboxSelectMultiple,
             'places': forms.CheckboxSelectMultiple,
         }

@@ -81,6 +81,7 @@ class Organization(models.Model):
     modus_operandi_keywords = models.TextField(blank=True, null=True, help_text="Enter modus operandi keywords, separated by semicolons")
     hierarchy_and_membership = models.TextField(blank=True, null=True, help_text="Describe hierarchy and membership details, separated by semicolons")
     relationships_with_other_entities = models.TextField(blank=True, null=True, help_text="Describe relationships with other entities, separated by semicolons")
+    internal_dynamics = models.TextField(blank=True, null=True, help_text="Describe internal dynamics, separated by semicolons")
     characters = models.ManyToManyField(Character, related_name='organizations', blank=True)
     places = models.ManyToManyField(Place, related_name='organizations', blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='organizations')

@@ -9,7 +9,7 @@ class ProjectForm(forms.ModelForm):
 class CharacterForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'role', 'description', 'traits', 'appearance', 'age', 'gender', 'primary_goal', 'secondary_goals', 'key_motivations', 'character_arc_summary', 'strengths', 'weaknesses', 'internal_conflict', 'external_conflict']
+        fields = ['name', 'role', 'description', 'traits', 'appearance', 'age', 'gender', 'primary_goal', 'secondary_goals', 'key_motivations', 'character_arc_summary', 'strengths', 'weaknesses', 'internal_conflict', 'external_conflict', 'thumbnail']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 8}),
             'traits': forms.Textarea(attrs={'rows': 3}),

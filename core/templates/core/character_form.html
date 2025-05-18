@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="project-editor">
-    <form method="post" class="project-form">
+    <form method="post" class="project-form" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="form-section">
@@ -96,6 +96,17 @@
             <div class="form-group">
                 <label for="{{ form.external_conflict.id_for_label }}">External Conflict</label>
                 {{ form.external_conflict }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.thumbnail.id_for_label }}">Thumbnail</label>
+                {{ form.thumbnail }}
+                {% if character and character.thumbnail %}
+                    <div style="margin-top: 10px;">
+                        <strong>Current Thumbnail:</strong><br>
+                        <img src="{{ character.thumbnail.url }}" alt="{{ character.name }} thumbnail" style="max-width: 150px; max-height: 150px; object-fit: cover; border-radius: 4px;">
+                    </div>
+                {% endif %}
             </div>
         </div>
         

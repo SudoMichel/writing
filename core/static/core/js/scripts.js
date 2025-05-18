@@ -1,15 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Place form improve description button
-    const improveButton = document.getElementById('improve-description');
-    if (improveButton) {
-        improveButton.addEventListener('click', function() {
-            improve({
+    const improvePlaceButton = document.getElementById('improve-description');
+    if (improvePlaceButton) {
+        improvePlaceButton.addEventListener('click', function() {
+            improveEntityDescription_Interactive({
                 buttonId: 'improve-description',
                 statusId: 'improvement-status',
                 textareaId: 'id_description',
                 endpoint: '/ai/improve/place/',
                 successProperty: 'improved_description',
-                successMessage: 'Description improved successfully!'
+                successMessage: 'Description improved successfully!',
+                entityType: 'place'
             });
         });
     }
@@ -18,13 +19,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const improveOrgButton = document.getElementById('improve-organization');
     if (improveOrgButton) {
         improveOrgButton.addEventListener('click', function() {
-            improve({
+            improveEntityDescription_Interactive({
                 buttonId: 'improve-organization',
                 statusId: 'improvement-status',
                 textareaId: 'id_description',
                 endpoint: '/ai/improve/organization/',
                 successProperty: 'improved_description',
-                successMessage: 'Notes improved successfully!'
+                successMessage: 'Description improved successfully!',
+                entityType: 'organization'
             });
         });
     }
@@ -33,13 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const improveBioButton = document.getElementById('improve-bio');
     if (improveBioButton) {
         improveBioButton.addEventListener('click', function() {
-            improve({
+            improveEntityDescription_Interactive({
                 buttonId: 'improve-bio',
                 statusId: 'improvement-status',
                 textareaId: 'id_description',
                 endpoint: '/ai/improve/character/',
                 successProperty: 'improved_bio',
-                successMessage: 'Bio improved successfully!'
+                successMessage: 'Bio improved successfully!',
+                entityType: 'character'
             });
         });
     }
@@ -59,86 +62,161 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
-    // Show Prompt buttons
-    setupShowPromptButtons();
-    
-    // Refine Text buttons
-    setupRefineTextButtons();
 });
 
-function setupShowPromptButtons() {
-    const showPromptButtons = document.querySelectorAll('.show-prompt-btn');
-    showPromptButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const projectId = this.dataset.projectId;
-            const entityType = this.dataset.entityType;
-            const entityId = this.dataset.entityId || 
-                             this.dataset.placeId || 
-                             this.dataset.organizationId || 
-                             this.dataset.characterId ||
-                             this.dataset.chapterId;
-            
-            showPrompt(projectId, entityType, entityId, this.dataset.statusId);
-        });
-    });
+// Helper function to get CSRF token (needed for POST requests in Django)
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
-async function showPrompt(projectId, entityType, entityId, statusId) {
-    const statusDiv = document.getElementById(statusId);
+async function improveEntityDescription_Interactive(config) {
+    const statusDiv = document.getElementById(config.statusId);
+    const improveButton = document.getElementById(config.buttonId);
+    const originalTextarea = document.getElementById(config.textareaId);
+    const projectId = improveButton.dataset.projectId;
+
+    let itemId;
+    if (config.entityType === 'character') itemId = improveButton.dataset.characterId;
+    else if (config.entityType === 'place') itemId = improveButton.dataset.placeId;
+    else if (config.entityType === 'organization') itemId = improveButton.dataset.organizationId;
     
+    if (!itemId) {
+        statusDiv.textContent = 'Error: Could not identify the item.';
+        statusDiv.className = 'improvement-status error';
+        if (improveButton) improveButton.disabled = false;
+        return;
+    }
+
+    let proposalContainerId = config.statusId + '-proposal-container';
+    let proposalContainer = document.getElementById(proposalContainerId);
+    if (!proposalContainer) {
+        proposalContainer = document.createElement('div');
+        proposalContainer.id = proposalContainerId;
+        proposalContainer.style.marginTop = '10px';
+        statusDiv.parentNode.insertBefore(proposalContainer, statusDiv.nextSibling);
+    }
+    proposalContainer.innerHTML = '';
+
     try {
-        statusDiv.textContent = 'Loading prompt...';
+        statusDiv.textContent = 'Fetching prompt...';
         statusDiv.className = 'improvement-status loading';
-        
-        const response = await fetch(`/ai/get-prompt/${projectId}/${entityType}/${entityId}/`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            const promptDiv = document.createElement('div');
-            promptDiv.classList.add('prompt-display');
-            promptDiv.style.whiteSpace = 'pre-wrap';
-            promptDiv.style.border = '1px solid #ccc';
-            promptDiv.style.padding = '10px';
-            promptDiv.style.margin = '10px 0';
-            promptDiv.style.backgroundColor = '#f9f9f9';
-            promptDiv.style.maxHeight = '300px';
-            promptDiv.style.overflowY = 'auto';
-            promptDiv.style.fontFamily = 'monospace';
-            promptDiv.style.fontSize = '12px';
-            promptDiv.textContent = data.prompt;
-            
-            statusDiv.textContent = 'Prompt:';
+        if (improveButton) improveButton.disabled = true;
+
+        const getPromptResponse = await fetch(`${config.endpoint}${projectId}/${itemId}/`);
+        const promptData = await getPromptResponse.json();
+
+        if (promptData.status === 'success' && promptData.prompt) {
+            statusDiv.textContent = 'Review and edit the prompt below:';
             statusDiv.className = 'improvement-status info';
-            
-            // Remove previous prompt if exists
-            const existingPrompt = statusDiv.nextElementSibling;
-            if (existingPrompt && existingPrompt.classList.contains('prompt-display')) {
-                existingPrompt.remove();
-            }
-            
-            // Add close button
-            const closeButton = document.createElement('button');
-            closeButton.textContent = 'Close';
-            closeButton.classList.add('btn', 'btn-secondary');
-            closeButton.style.marginTop = '5px';
-            closeButton.onclick = () => {
-                promptDiv.remove();
-                closeButton.remove();
-                statusDiv.textContent = '';
-                statusDiv.className = '';
+
+            const promptEditorTextarea = document.createElement('textarea');
+            promptEditorTextarea.style.width = '100%';
+            promptEditorTextarea.style.minHeight = '150px';
+            promptEditorTextarea.style.marginBottom = '10px';
+            promptEditorTextarea.value = promptData.prompt;
+
+            const executeButton = document.createElement('button');
+            executeButton.textContent = 'Generate Improvement with this Prompt';
+            executeButton.classList.add('btn', 'btn-primary');
+            executeButton.onclick = async () => {
+                const editedPrompt = promptEditorTextarea.value;
+                statusDiv.textContent = 'Generating proposal with your prompt...';
+                statusDiv.className = 'improvement-status loading';
+                executeButton.disabled = true;
+                promptEditorTextarea.disabled = true;
+
+                try {
+                    const executeResponse = await fetch(`${config.endpoint}${projectId}/${itemId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ prompt: editedPrompt })
+                    });
+                    const improvementData = await executeResponse.json();
+
+                    if (improvementData.status === 'success') {
+                        const proposedText = improvementData[config.successProperty]; 
+                        _displayProposalUI(statusDiv, proposalContainer, originalTextarea, improveButton, proposedText, config.successMessage);
+                    } else {
+                        throw new Error(improvementData.message || 'Failed to generate proposal');
+                    }
+                } catch (execError) {
+                    statusDiv.textContent = `Error generating improvement: ${execError.message}`;
+                    statusDiv.className = 'improvement-status error';
+                    proposalContainer.innerHTML = '';
+                    if (improveButton) improveButton.disabled = false;
+                }
             };
-            
-            // Insert after status div
-            statusDiv.parentNode.insertBefore(promptDiv, statusDiv.nextSibling);
-            promptDiv.parentNode.insertBefore(closeButton, promptDiv.nextSibling);
+
+            proposalContainer.appendChild(promptEditorTextarea);
+            proposalContainer.appendChild(executeButton);
+
         } else {
-            throw new Error(data.message || 'Failed to get prompt');
+            throw new Error(promptData.message || 'Failed to fetch prompt');
         }
     } catch (error) {
         statusDiv.textContent = `Error: ${error.message}`;
         statusDiv.className = 'improvement-status error';
+        proposalContainer.innerHTML = '';
+        if (improveButton) improveButton.disabled = false;
     }
+}
+
+function _displayProposalUI(statusDiv, proposalContainer, originalTextarea, improveButton, proposedText, successMessage) {
+    statusDiv.textContent = 'Proposal ready:';
+    statusDiv.className = 'improvement-status info';
+    
+    proposalContainer.innerHTML = ''; // Clear previous content like prompt editor
+
+    const proposalPreview = document.createElement('div');
+    proposalPreview.classList.add('proposal-preview');
+    proposalPreview.style.border = '1px solid #ccc';
+    proposalPreview.style.padding = '10px';
+    proposalPreview.style.marginBottom = '10px';
+    proposalPreview.style.maxHeight = '200px';
+    proposalPreview.style.overflowY = 'auto';
+    proposalPreview.style.backgroundColor = '#f9f9f9';
+    proposalPreview.style.whiteSpace = 'pre-wrap';
+    proposalPreview.textContent = proposedText;
+
+    const acceptButton = document.createElement('button');
+    acceptButton.textContent = 'Accept';
+    acceptButton.classList.add('btn', 'btn-success');
+    acceptButton.style.marginRight = '5px';
+    acceptButton.onclick = () => {
+        originalTextarea.value = proposedText;
+        statusDiv.textContent = successMessage;
+        statusDiv.className = 'improvement-status success';
+        proposalContainer.innerHTML = '';
+        if (improveButton) improveButton.disabled = false;
+    };
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Cancel';
+    cancelButton.classList.add('btn', 'btn-secondary');
+    cancelButton.onclick = () => {
+        statusDiv.textContent = 'Improvement cancelled.';
+        statusDiv.className = 'improvement-status info';
+        proposalContainer.innerHTML = '';
+        if (improveButton) improveButton.disabled = false;
+    };
+    
+    proposalContainer.appendChild(proposalPreview);
+    proposalContainer.appendChild(acceptButton);
+    proposalContainer.appendChild(cancelButton);
 }
 
 async function improve(config) {
@@ -168,46 +246,7 @@ async function improve(config) {
 
         if (data.status === 'success') {
             const proposedText = data[config.successProperty];
-            statusDiv.textContent = 'Proposal ready:';
-            statusDiv.className = 'improvement-status info'; // A new class for neutral info
-
-            const proposalPreview = document.createElement('div');
-            proposalPreview.classList.add('proposal-preview');
-            proposalPreview.style.border = '1px solid #ccc';
-            proposalPreview.style.padding = '10px';
-            proposalPreview.style.marginBottom = '10px';
-            proposalPreview.style.maxHeight = '200px';
-            proposalPreview.style.overflowY = 'auto';
-            proposalPreview.style.backgroundColor = '#f9f9f9';
-            proposalPreview.style.whiteSpace = 'pre-wrap'; // To respect newlines from AI
-            proposalPreview.textContent = proposedText;
-
-            const acceptButton = document.createElement('button');
-            acceptButton.textContent = 'Accept';
-            acceptButton.classList.add('btn', 'btn-success'); // Assuming btn-success is available or can be styled
-            acceptButton.style.marginRight = '5px';
-            acceptButton.onclick = () => {
-                textarea.value = proposedText;
-                statusDiv.textContent = config.successMessage;
-                statusDiv.className = 'improvement-status success';
-                proposalContainer.innerHTML = '';
-                improveButton.disabled = false;
-            };
-
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = 'Cancel';
-            cancelButton.classList.add('btn', 'btn-secondary');
-            cancelButton.onclick = () => {
-                statusDiv.textContent = 'Improvement cancelled.';
-                statusDiv.className = 'improvement-status info';
-                proposalContainer.innerHTML = '';
-                improveButton.disabled = false;
-            };
-
-            proposalContainer.appendChild(proposalPreview);
-            proposalContainer.appendChild(acceptButton);
-            proposalContainer.appendChild(cancelButton);
-
+            _displayProposalUI(statusDiv, proposalContainer, textarea, improveButton, proposedText, config.successMessage);
         } else {
             throw new Error(data.message || 'Failed to generate proposal');
         }
@@ -216,121 +255,5 @@ async function improve(config) {
         statusDiv.className = 'improvement-status error';
         proposalContainer.innerHTML = '';
         improveButton.disabled = false; // Re-enable button on error
-    }
-}
-
-function setupRefineTextButtons() {
-    const refineTextButtons = document.querySelectorAll('.refine-text-btn');
-    refineTextButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const projectId = this.dataset.projectId;
-            const entityType = this.dataset.entityType;
-            // Determine entityId based on available data attributes
-            const entityId = this.dataset.characterId || 
-                             this.dataset.placeId || 
-                             this.dataset.organizationId ||
-                             this.dataset.chapterId; 
-            
-            let statusId = this.dataset.statusId || 'improvement-status'; 
-            let textareaId = this.dataset.textareaId || 'id_description'; 
-            let successProperty = 'refined_description'; 
-
-            if (entityType === 'character') {
-                successProperty = 'refined_bio';
-            } else if (entityType === 'chapter') {
-                successProperty = 'refined_content';
-                textareaId = 'id_content'; // Specific textarea for chapter content
-                statusId = this.dataset.statusId || 'chapter-writing-status'; // Specific status ID for chapters
-            }
-            // Add more conditions if other entity types/attributes are supported
-
-            refineText({
-                buttonId: this.id, 
-                statusId: statusId,
-                textareaId: textareaId,
-                endpoint: `/ai/refine/${entityType}/${projectId}/${entityId}/`,
-                successProperty: successProperty,
-                successMessage: 'Text refined successfully!',
-            });
-        });
-    });
-}
-
-async function refineText(config) {
-    const statusDiv = document.getElementById(config.statusId);
-    const refineButton = document.getElementById(config.buttonId); // Assumes button has an ID
-    const textarea = document.getElementById(config.textareaId);
-
-    let proposalContainerId = config.statusId + '-proposal-container';
-    let proposalContainer = document.getElementById(proposalContainerId);
-    if (!proposalContainer) {
-        proposalContainer = document.createElement('div');
-        proposalContainer.id = proposalContainerId;
-        proposalContainer.style.marginTop = '10px';
-        statusDiv.parentNode.insertBefore(proposalContainer, statusDiv.nextSibling);
-    }
-    proposalContainer.innerHTML = ''; // Clear previous proposals
-
-    try {
-        statusDiv.textContent = 'Refining text...';
-        statusDiv.className = 'improvement-status loading';
-        if (refineButton) refineButton.disabled = true;
-
-        // Note: The refine_attribute_text backend doesn't need project/item IDs in the POST body
-        // It gets them from the URL. It also doesn't need the current text from the form,
-        // as it fetches the attribute directly from the database entity.
-        const response = await fetch(config.endpoint); // GET request is fine as no body is sent
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            const proposedText = data[config.successProperty];
-            statusDiv.textContent = 'Refinement proposal ready:';
-            statusDiv.className = 'improvement-status info';
-
-            const proposalPreview = document.createElement('div');
-            proposalPreview.classList.add('proposal-preview');
-            proposalPreview.style.border = '1px solid #ccc';
-            proposalPreview.style.padding = '10px';
-            proposalPreview.style.marginBottom = '10px';
-            proposalPreview.style.maxHeight = '200px';
-            proposalPreview.style.overflowY = 'auto';
-            proposalPreview.style.backgroundColor = '#f9f9f9';
-            proposalPreview.style.whiteSpace = 'pre-wrap';
-            proposalPreview.textContent = proposedText;
-
-            const acceptButton = document.createElement('button');
-            acceptButton.textContent = 'Accept';
-            acceptButton.classList.add('btn', 'btn-success');
-            acceptButton.style.marginRight = '5px';
-            acceptButton.onclick = () => {
-                textarea.value = proposedText;
-                statusDiv.textContent = config.successMessage;
-                statusDiv.className = 'improvement-status success';
-                proposalContainer.innerHTML = '';
-                if (refineButton) refineButton.disabled = false;
-            };
-
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = 'Cancel';
-            cancelButton.classList.add('btn', 'btn-secondary');
-            cancelButton.onclick = () => {
-                statusDiv.textContent = 'Refinement cancelled.';
-                statusDiv.className = 'improvement-status info';
-                proposalContainer.innerHTML = '';
-                if (refineButton) refineButton.disabled = false;
-            };
-
-            proposalContainer.appendChild(proposalPreview);
-            proposalContainer.appendChild(acceptButton);
-            proposalContainer.appendChild(cancelButton);
-
-        } else {
-            throw new Error(data.message || 'Failed to refine text');
-        }
-    } catch (error) {
-        statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.className = 'improvement-status error';
-        proposalContainer.innerHTML = '';
-        if (refineButton) refineButton.disabled = false;
     }
 }

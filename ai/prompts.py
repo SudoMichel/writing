@@ -56,17 +56,6 @@ Please provide an improved organization description that:
     llm_context="{llm_context}"
 )
 
-# Project summary prompt
-PROJECT_SUMMARY_PROMPT = '''Create a comprehensive summary of this writing project that includes:
-1. Brief project overview
-2. Key characters and roles
-3. Main plot points in sequence
-4. Important locations and organizations
-5. Notable character relationships
-
-Project data:
-{llm_context}'''
-
 # Chapter content prompt
 CHAPTER_CONTENT_PROMPT = '''Write the content for Chapter {chapter_number}: {chapter_title}
 
@@ -78,15 +67,4 @@ Be consistent with existing characters, plot progression, and tone.
 Provide only the chapter content without comments or explanations. No chapter title, chapter number, or chapter notes.
 
 Relevant project context:
-{llm_context}'''
-
-REFINE_TEXT_PROMPT = '''Please refine the following text to improve its language, word choice, and sentence structure.
-The goal is to make the text more clear, eloquent, vivid, and aesthetically pleasing.
-Focus solely on linguistic refinement. Do NOT add new information, change the core meaning, or expand the content.
-The refined text should be a direct replacement for the original, maintaining its original intent and length as much as possible while enhancing its literary quality.
-Output plain text only. Aim for the style of Nabokov.
-
-Original text:
-{text_to_refine}
-
-Refined text:''' 
+{llm_context}''' 

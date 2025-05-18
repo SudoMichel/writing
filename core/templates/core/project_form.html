@@ -16,6 +16,16 @@
             <div class="project-description">
                 {{ project.description|linebreaks }}
             </div>
+            {% if project.genre %}
+            <div class="project-genre">
+                <strong>Genre:</strong> {{ project.genre }}
+            </div>
+            {% endif %}
+            {% if project.style %}
+            <div class="project-style">
+                <strong>Style:</strong> {{ project.style }}
+            </div>
+            {% endif %}
         </div>
     </div>
     {% else %}
@@ -32,6 +42,14 @@
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}">Description</label>
                 {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.genre.id_for_label }}">Genre (Optional)</label>
+                {{ form.genre }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.style.id_for_label }}">Style (Optional)</label>
+                {{ form.style }}
             </div>
         </div>
 

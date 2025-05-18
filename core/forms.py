@@ -4,7 +4,7 @@ from .models import Project, Character, Place, Organization, Chapter, PlotPoint,
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'genre', 'style']
 
 class CharacterForm(forms.ModelForm):
     class Meta:

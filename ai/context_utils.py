@@ -7,6 +7,8 @@ def get_project_context(project):
         'project': {
             'name': project.name,
             'description': project.description,
+            'genre': project.genre,
+            'style': project.style,
             'characters': [],
             'plot_points': [],
             'places': [],
@@ -95,6 +97,8 @@ def get_project_context(project):
     # Format the context for the LLM
     llm_context = f"""Project: {context_data['project']['name']}
 Description: {context_data['project']['description']}
+Genre: {context_data['project']['genre'] if context_data['project']['genre'] else 'Not specified'}
+Style: {context_data['project']['style'] if context_data['project']['style'] else 'Not specified'}
 
 Characters:
 {json.dumps(context_data['project']['characters'], indent=2, ensure_ascii=False)}

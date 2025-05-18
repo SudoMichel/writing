@@ -6,6 +6,8 @@ def get_project_context(project):
         'project': {
             'name': project.name,
             'description': project.description,
+            'core_premise': project.core_premise,
+            'key_themes': project.key_themes,
             'genre': project.genre,
             'style': project.style,
             'characters': [],
@@ -126,6 +128,8 @@ def get_project_context(project):
     llm_context_parts = [
         f"Project: {context_data['project']['name']}",
         f"Description: {context_data['project']['description']}",
+        f"Core Premise: {context_data['project']['core_premise'] if context_data['project']['core_premise'] else 'Not specified'}",
+        f"Key Themes: {context_data['project']['key_themes'] if context_data['project']['key_themes'] else 'Not specified'}",
         f"Genre: {context_data['project']['genre'] if context_data['project']['genre'] else 'Not specified'}",
         f"Style: {context_data['project']['style'] if context_data['project']['style'] else 'Not specified'}"
     ]

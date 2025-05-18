@@ -19,6 +19,12 @@
         <div class="section">
             <h2>Project: {{ raw_data.project.name }}</h2>
             <p><strong>Description:</strong> {{ raw_data.project.description }}</p>
+            {% if raw_data.project.core_premise %}
+            <p><strong>Core Premise:</strong> {{ raw_data.project.core_premise }}</p>
+            {% endif %}
+            {% if raw_data.project.key_themes %}
+            <p><strong>Key Themes:</strong> {{ raw_data.project.key_themes }}</p>
+            {% endif %}
             {% if raw_data.project.genre %}
             <p><strong>Genre:</strong> {{ raw_data.project.genre }}</p>
             {% endif %}

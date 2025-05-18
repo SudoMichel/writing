@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 class Project(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
+    core_premise = models.TextField(blank=True, null=True)
+    key_themes = models.TextField(blank=True, null=True, help_text="Enter key themes, separated by commas")
     genre = models.CharField(max_length=100, blank=True, null=True)
     style = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

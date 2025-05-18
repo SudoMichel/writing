@@ -10,7 +10,10 @@
     <div class="section">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>LLM Context (JSON)</h2>
-            <button id="copy-llm-context-btn" class="btn btn-secondary">Copy JSON</button>
+            <div>
+                <button id="copy-llm-context-btn" class="btn btn-secondary">Copy JSON</button>
+                <button id="save-llm-context-btn" class="btn btn-primary">Save JSON</button>
+            </div>
         </div>
         {% if llm_context %}
             <pre id="llm-context-pre">{{ llm_context }}</pre>

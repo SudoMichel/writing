@@ -2,7 +2,11 @@
 
 <div class="item-list">
     <div class="item-content">
-        <h3>{{ item.title }}</h3>
+        {% if item_type == 'plot_point' %}
+            <h3>{{ item.order }}. {{ item.title }}</h3>
+        {% else %}
+            <h3>{{ item.title }}</h3>
+        {% endif %}
 
         {% if item_type == 'plot_point' %}
             <div class="item-body">

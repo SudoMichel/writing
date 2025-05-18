@@ -1,67 +1,54 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Place form improve description button
-    const improvePlaceButton = document.getElementById('improve-description');
-    if (improvePlaceButton) {
-        improvePlaceButton.addEventListener('click', function() {
-            improveEntityDescription_Interactive({
-                buttonId: 'improve-description',
-                statusId: 'improvement-status',
-                textareaId: 'id_description',
-                endpoint: '/ai/improve/place/',
-                successProperty: 'improved_description',
-                successMessage: 'Description improved successfully!',
-                entityType: 'place'
+    const commonImprovementStatusId = 'improvement-status';
+    const commonTextareaId = 'id_description';
+
+    // Helper function to setup improvement button listeners
+    function setupImprovementButton(buttonId, handlerFunction, baseConfig) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('click', function() {
+                // Pass the buttonId in the config as it's used by the handlers
+                const fullConfig = { ...baseConfig, buttonId: buttonId };
+                handlerFunction(fullConfig);
             });
-        });
-    }
-    
-    // Organization form improve purpose button
-    const improveOrgButton = document.getElementById('improve-organization');
-    if (improveOrgButton) {
-        improveOrgButton.addEventListener('click', function() {
-            improveEntityDescription_Interactive({
-                buttonId: 'improve-organization',
-                statusId: 'improvement-status',
-                textareaId: 'id_description',
-                endpoint: '/ai/improve/organization/',
-                successProperty: 'improved_description',
-                successMessage: 'Description improved successfully!',
-                entityType: 'organization'
-            });
-        });
-    }
-    
-    // Character form improve bio button
-    const improveBioButton = document.getElementById('improve-bio');
-    if (improveBioButton) {
-        improveBioButton.addEventListener('click', function() {
-            improveEntityDescription_Interactive({
-                buttonId: 'improve-bio',
-                statusId: 'improvement-status',
-                textareaId: 'id_description',
-                endpoint: '/ai/improve/character/',
-                successProperty: 'improved_bio',
-                successMessage: 'Bio improved successfully!',
-                entityType: 'character'
-            });
-        });
+        }
     }
 
-    // Chapter form write chapter button
-    const writeChapterButton = document.getElementById('write-chapter');
-    if (writeChapterButton) {
-        writeChapterButton.addEventListener('click', function() {
-            improve({
-                buttonId: 'write-chapter',
-                statusId: 'chapter-writing-status',
-                textareaId: 'id_content', // Assuming the content textarea has id 'id_content'
-                endpoint: '/ai/generate-chapter/',
-                successProperty: 'generated_content',
-                successMessage: 'Chapter content generated successfully!',
-                itemIdProperty: 'chapterId' // To pick up data-chapter-id
-            });
-        });
-    }
+    setupImprovementButton('improve-description', improveEntityDescription_Interactive, {
+        statusId: commonImprovementStatusId,
+        textareaId: commonTextareaId,
+        endpoint: '/ai/improve/place/',
+        successProperty: 'improved_description',
+        successMessage: 'Description improved successfully!',
+        datasetKey: 'placeId' // Standardized
+    });
+
+    setupImprovementButton('improve-organization', improveEntityDescription_Interactive, {
+        statusId: commonImprovementStatusId,
+        textareaId: commonTextareaId,
+        endpoint: '/ai/improve/organization/',
+        successProperty: 'improved_description',
+        successMessage: 'Description improved successfully!',
+        datasetKey: 'organizationId' // Standardized
+    });
+
+    setupImprovementButton('improve-bio', improveEntityDescription_Interactive, {
+        statusId: commonImprovementStatusId,
+        textareaId: commonTextareaId, // Assuming same textarea for bio description
+        endpoint: '/ai/improve/character/',
+        successProperty: 'improved_bio',
+        successMessage: 'Bio improved successfully!',
+        datasetKey: 'characterId' // Standardized
+    });
+
+    setupImprovementButton('write-chapter', improveEntityDescription_Interactive, {
+        statusId: 'chapter-writing-status',
+        textareaId: 'id_content',
+        endpoint: '/ai/improve/chapter/',
+        successProperty: 'generated_content',
+        successMessage: 'Chapter content generated successfully!',
+        datasetKey: 'chapterId'
+    });
 });
 
 // Helper function to get CSRF token (needed for POST requests in Django)
@@ -80,25 +67,9 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function improveEntityDescription_Interactive(config) {
-    const statusDiv = document.getElementById(config.statusId);
-    const improveButton = document.getElementById(config.buttonId);
-    const originalTextarea = document.getElementById(config.textareaId);
-    const projectId = improveButton.dataset.projectId;
-
-    let itemId;
-    if (config.entityType === 'character') itemId = improveButton.dataset.characterId;
-    else if (config.entityType === 'place') itemId = improveButton.dataset.placeId;
-    else if (config.entityType === 'organization') itemId = improveButton.dataset.organizationId;
-    
-    if (!itemId) {
-        statusDiv.textContent = 'Error: Could not identify the item.';
-        statusDiv.className = 'improvement-status error';
-        if (improveButton) improveButton.disabled = false;
-        return;
-    }
-
-    let proposalContainerId = config.statusId + '-proposal-container';
+// Helper function to get or create the proposal container
+function _getOrCreateProposalContainer(statusId, statusDiv) {
+    const proposalContainerId = statusId + '-proposal-container';
     let proposalContainer = document.getElementById(proposalContainerId);
     if (!proposalContainer) {
         proposalContainer = document.createElement('div');
@@ -106,12 +77,41 @@ async function improveEntityDescription_Interactive(config) {
         proposalContainer.style.marginTop = '10px';
         statusDiv.parentNode.insertBefore(proposalContainer, statusDiv.nextSibling);
     }
-    proposalContainer.innerHTML = '';
+    proposalContainer.innerHTML = ''; // Clear previous content
+    return proposalContainer;
+}
+
+// Helper function to handle errors during API requests
+function _handleRequestError(statusDiv, proposalContainer, buttonToReEnable, error, errorMessagePrefix = 'Error') {
+    const message = error.message || 'An unknown error occurred.';
+    statusDiv.textContent = `${errorMessagePrefix}: ${message}`;
+    statusDiv.className = 'improvement-status error';
+    if (proposalContainer) {
+        proposalContainer.innerHTML = '';
+    }
+    if (buttonToReEnable) {
+        buttonToReEnable.disabled = false;
+    }
+}
+
+async function improveEntityDescription_Interactive(config) {
+    const improveButton = document.getElementById(config.buttonId);
+    const originalTextarea = document.getElementById(config.textareaId);
+    const statusDiv = document.getElementById(config.statusId);
+    const projectId = improveButton.dataset.projectId;
+    const itemId = improveButton.dataset[config.datasetKey];
+
+    if (!itemId) {
+        _handleRequestError(statusDiv, null, improveButton, new Error(`Could not find item ID using data attribute 'data-${config.datasetKey}'.`), 'Configuration Error');
+        return;
+    }
+
+    const proposalContainer = _getOrCreateProposalContainer(config.statusId, statusDiv);
 
     try {
         statusDiv.textContent = 'Fetching prompt...';
         statusDiv.className = 'improvement-status loading';
-        if (improveButton) improveButton.disabled = true;
+        improveButton.disabled = true;
 
         const getPromptResponse = await fetch(`${config.endpoint}${projectId}/${itemId}/`);
         const promptData = await getPromptResponse.json();
@@ -148,16 +148,13 @@ async function improveEntityDescription_Interactive(config) {
                     const improvementData = await executeResponse.json();
 
                     if (improvementData.status === 'success') {
-                        const proposedText = improvementData[config.successProperty]; 
+                        const proposedText = improvementData[config.successProperty];
                         _displayProposalUI(statusDiv, proposalContainer, originalTextarea, improveButton, proposedText, config.successMessage);
                     } else {
                         throw new Error(improvementData.message || 'Failed to generate proposal');
                     }
                 } catch (execError) {
-                    statusDiv.textContent = `Error generating improvement: ${execError.message}`;
-                    statusDiv.className = 'improvement-status error';
-                    proposalContainer.innerHTML = '';
-                    if (improveButton) improveButton.disabled = false;
+                    _handleRequestError(statusDiv, proposalContainer, improveButton, execError, 'Error generating improvement');
                 }
             };
 
@@ -168,10 +165,7 @@ async function improveEntityDescription_Interactive(config) {
             throw new Error(promptData.message || 'Failed to fetch prompt');
         }
     } catch (error) {
-        statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.className = 'improvement-status error';
-        proposalContainer.innerHTML = '';
-        if (improveButton) improveButton.disabled = false;
+        _handleRequestError(statusDiv, proposalContainer, improveButton, error, 'Error fetching prompt');
     }
 }
 
@@ -220,21 +214,18 @@ function _displayProposalUI(statusDiv, proposalContainer, originalTextarea, impr
 }
 
 async function improve(config) {
-    const statusDiv = document.getElementById(config.statusId);
     const improveButton = document.getElementById(config.buttonId);
     const textarea = document.getElementById(config.textareaId);
+    const statusDiv = document.getElementById(config.statusId);
     const projectId = improveButton.dataset.projectId;
-    const itemId = improveButton.dataset[config.itemIdProperty || 'placeId'] || improveButton.dataset.organizationId || improveButton.dataset.characterId; // Use general itemIdProperty
+    const itemId = improveButton.dataset[config.datasetKey]; // Use standardized datasetKey
 
-    let proposalContainerId = config.statusId + '-proposal-container';
-    let proposalContainer = document.getElementById(proposalContainerId);
-    if (!proposalContainer) {
-        proposalContainer = document.createElement('div');
-        proposalContainer.id = proposalContainerId;
-        proposalContainer.style.marginTop = '10px'; // Add some space
-        statusDiv.parentNode.insertBefore(proposalContainer, statusDiv.nextSibling);
+    if (!itemId) {
+        _handleRequestError(statusDiv, null, improveButton, new Error(`Could not find item ID using data attribute 'data-${config.datasetKey}'.`), 'Configuration Error');
+        return;
     }
-    proposalContainer.innerHTML = ''; // Clear previous proposals
+
+    const proposalContainer = _getOrCreateProposalContainer(config.statusId, statusDiv);
 
     try {
         statusDiv.textContent = 'Generating proposal...';
@@ -251,9 +242,6 @@ async function improve(config) {
             throw new Error(data.message || 'Failed to generate proposal');
         }
     } catch (error) {
-        statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.className = 'improvement-status error';
-        proposalContainer.innerHTML = '';
-        improveButton.disabled = false; // Re-enable button on error
+        _handleRequestError(statusDiv, proposalContainer, improveButton, error, 'Error generating proposal');
     }
 }

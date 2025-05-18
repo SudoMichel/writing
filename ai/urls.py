@@ -9,5 +9,5 @@ urlpatterns = [
     path('improve/character/<int:project_id>/<int:entity_id>/', views.improve_entity_description, {'entity_type': 'character'}, name='improve_character'),
     path('improve/place/<int:project_id>/<int:entity_id>/', views.improve_entity_description, {'entity_type': 'place'}, name='improve_place'),
     path('improve/organization/<int:project_id>/<int:entity_id>/', views.improve_entity_description, {'entity_type': 'organization'}, name='improve_organization'),
-    path('generate-chapter/<int:project_id>/<int:chapter_id>/', views.generate_chapter_content, name='generate_chapter_content'),
+    path('improve/chapter/<int:project_id>/<int:entity_id>/', views.improve_entity_description, {'entity_type': 'chapter'}, name='improve_chapter'),
 ] 

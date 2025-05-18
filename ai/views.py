@@ -60,6 +60,16 @@ def improve_entity_description(request, project_id, entity_type, entity_id):
         prompt_template = ORG_DESCRIPTION_PROMPT
         prompt_args = {'name': entity.name, 'org_type': entity.type, 'description': entity.description}
         response_key = 'improved_description'
+    elif entity_type == 'chapter':
+        entity = get_object_or_404(Chapter, pk=entity_id, project=project)
+        prompt_template = CHAPTER_CONTENT_PROMPT
+        prompt_args = {
+            'chapter_title': entity.title or "Untitled",
+            'chapter_number': entity.chapter_number or "N/A",
+            'point_of_view_character': entity.point_of_view.name if entity.point_of_view else "Not specified",
+            'chapter_notes': entity.notes or "None",
+        }
+        response_key = 'generated_content'
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid entity type'}, status=400)
 
@@ -93,32 +103,3 @@ def improve_entity_description(request, project_id, entity_type, entity_id):
             }, status=500)
     
     return JsonResponse({'status': 'error', 'message': 'Unsupported request method'}, status=405)
-
-
-@require_api_key
-def generate_chapter_content(request, project_id, chapter_id):
-    project = get_object_or_404(Project, pk=project_id)
-    chapter = get_object_or_404(Chapter, pk=chapter_id, project=project)
-    _, llm_context = get_project_context(project)
-
-    try:
-        prompt = CHAPTER_CONTENT_PROMPT.format(
-            chapter_title=chapter.title or "Untitled",
-            chapter_number=chapter.chapter_number or "N/A",
-            point_of_view_character=chapter.point_of_view.name if chapter.point_of_view else "Not specified",
-            chapter_notes=chapter.notes or "None",
-            llm_context=llm_context
-        )
-        
-        generated_content = generate_llm_response(prompt)
-        
-        return JsonResponse({
-            'status': 'success',
-            'generated_content': generated_content,
-            'chapter_title': chapter.title
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Error generating chapter content: {str(e)}'
-        }, status=500)

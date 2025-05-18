@@ -34,6 +34,23 @@ def get_project_context(project):
         if character.gender:
             char_data['gender'] = character.gender
         
+        if character.primary_goal:
+            char_data['primary_goal'] = character.primary_goal
+        if character.secondary_goals:
+            char_data['secondary_goals'] = character.secondary_goals
+        if character.key_motivations:
+            char_data['key_motivations'] = character.key_motivations
+        if character.character_arc_summary:
+            char_data['character_arc_summary'] = character.character_arc_summary
+        if character.strengths:
+            char_data['strengths'] = character.strengths
+        if character.weaknesses:
+            char_data['weaknesses'] = character.weaknesses
+        if character.internal_conflict:
+            char_data['internal_conflict'] = character.internal_conflict
+        if character.external_conflict:
+            char_data['external_conflict'] = character.external_conflict
+        
         relationships_list = []
         for rel in character.relationships_from.all():
             relationships_list.append({
@@ -69,11 +86,20 @@ def get_project_context(project):
     
     for plot_point in project.plot_points.all():
         plot_data = {
-            'title': plot_point.title,
-            'description': plot_point.description,
             'order': plot_point.order,
+            'title': plot_point.title,
+            'narrative_function': plot_point.narrative_function,
             'chapter_title': plot_point.chapter.title if plot_point.chapter else None
         }
+        if plot_point.key_events:
+            plot_data['key_events'] = plot_point.key_events
+        if plot_point.information_revealed_to_reader:
+            plot_data['information_revealed_to_reader'] = plot_point.information_revealed_to_reader
+        if plot_point.character_development_achieved:
+            plot_data['character_development_achieved'] = plot_point.character_development_achieved
+        if plot_point.conflict_introduced_or_escalated:
+            plot_data['conflict_introduced_or_escalated'] = plot_point.conflict_introduced_or_escalated
+
         plot_chars = [char.name for char in plot_point.characters.all()]
         if plot_chars:
             plot_data['characters'] = plot_chars
@@ -124,10 +150,7 @@ def get_project_context(project):
         }
         context_data['project']['research_notes'].append(note_data)
     
-    # Format the llm_context as a valid JSON string.
-    # The context_data['project'] dictionary now contains all project details,
-    # including characters, plot points, etc., as nested Python structures.
-    # We serialize this entire dictionary into a single JSON string.
+
     llm_context = json.dumps(context_data['project'], indent=2, ensure_ascii=False)
             
     return context_data, llm_context 

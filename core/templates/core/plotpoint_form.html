@@ -18,8 +18,32 @@
             </div>
             
             <div class="form-group">
-                <label for="{{ form.description.id_for_label }}">Description *</label>
-                {{ form.description }}
+                <label for="{{ form.narrative_function.id_for_label }}">Narrative Function</label>
+                {{ form.narrative_function }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.key_events.id_for_label }}">Key Events</label>
+                {{ form.key_events }}
+                <p class="help-text">{{ form.key_events.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.information_revealed_to_reader.id_for_label }}">Information Revealed to Reader</label>
+                {{ form.information_revealed_to_reader }}
+                <p class="help-text">{{ form.information_revealed_to_reader.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.character_development_achieved.id_for_label }}">Character Development Achieved</label>
+                {{ form.character_development_achieved }}
+                <p class="help-text">{{ form.character_development_achieved.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.conflict_introduced_or_escalated.id_for_label }}">Conflict Introduced/Escalated</label>
+                {{ form.conflict_introduced_or_escalated }}
+                <p class="help-text">{{ form.conflict_introduced_or_escalated.help_text }}</p>
             </div>
             
             <div class="form-group">

@@ -53,6 +53,50 @@
                 <label for="{{ form.gender.id_for_label }}">Gender</label>
                 {{ form.gender }}
             </div>
+
+            <div class="form-group">
+                <label for="{{ form.primary_goal.id_for_label }}">Primary Goal</label>
+                {{ form.primary_goal }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.secondary_goals.id_for_label }}">Secondary Goals</label>
+                {{ form.secondary_goals }}
+                <p class="help-text">{{ form.secondary_goals.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.key_motivations.id_for_label }}">Key Motivations</label>
+                {{ form.key_motivations }}
+                <p class="help-text">{{ form.key_motivations.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.character_arc_summary.id_for_label }}">Character Arc Summary</label>
+                {{ form.character_arc_summary }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.strengths.id_for_label }}">Strengths</label>
+                {{ form.strengths }}
+                <p class="help-text">{{ form.strengths.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.weaknesses.id_for_label }}">Weaknesses</label>
+                {{ form.weaknesses }}
+                <p class="help-text">{{ form.weaknesses.help_text }}</p>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.internal_conflict.id_for_label }}">Internal Conflict</label>
+                {{ form.internal_conflict }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.external_conflict.id_for_label }}">External Conflict</label>
+                {{ form.external_conflict }}
+            </div>
         </div>
         
         {% if project.characters.count > 1 %}

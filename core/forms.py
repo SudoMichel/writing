@@ -9,7 +9,19 @@ class ProjectForm(forms.ModelForm):
 class CharacterForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'role', 'description', 'traits', 'appearance', 'age', 'gender']
+        fields = ['name', 'role', 'description', 'traits', 'appearance', 'age', 'gender', 'primary_goal', 'secondary_goals', 'key_motivations', 'character_arc_summary', 'strengths', 'weaknesses', 'internal_conflict', 'external_conflict']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 8}),
+            'traits': forms.Textarea(attrs={'rows': 3}),
+            'appearance': forms.Textarea(attrs={'rows': 3}),
+            'secondary_goals': forms.Textarea(attrs={'rows': 3}),
+            'key_motivations': forms.Textarea(attrs={'rows': 3}),
+            'character_arc_summary': forms.Textarea(attrs={'rows': 3}),
+            'strengths': forms.Textarea(attrs={'rows': 3}),
+            'weaknesses': forms.Textarea(attrs={'rows': 3}),
+            'internal_conflict': forms.Textarea(attrs={'rows': 3}),
+            'external_conflict': forms.Textarea(attrs={'rows': 3}),
+        }
 
 class PlaceForm(forms.ModelForm):
     class Meta:
@@ -41,8 +53,13 @@ class ChapterForm(forms.ModelForm):
 class PlotPointForm(forms.ModelForm):
     class Meta:
         model = PlotPoint
-        fields = ['title', 'description', 'order', 'characters', 'places', 'organizations', 'chapter']
+        fields = ['title', 'narrative_function', 'order', 'key_events', 'information_revealed_to_reader', 'character_development_achieved', 'conflict_introduced_or_escalated', 'characters', 'places', 'organizations', 'chapter']
         widgets = {
+            'narrative_function': forms.Textarea(attrs={'rows': 3}),
+            'key_events': forms.Textarea(attrs={'rows': 3}),
+            'information_revealed_to_reader': forms.Textarea(attrs={'rows': 3}),
+            'character_development_achieved': forms.Textarea(attrs={'rows': 3}),
+            'conflict_introduced_or_escalated': forms.Textarea(attrs={'rows': 3}),
             'characters': forms.CheckboxSelectMultiple,
             'places': forms.CheckboxSelectMultiple,
             'organizations': forms.CheckboxSelectMultiple,

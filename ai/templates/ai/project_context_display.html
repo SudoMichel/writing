@@ -45,6 +45,14 @@
                             <p><em>Appearance:</em> {{ char.appearance|default:"N/A" }}</p>
                             <p><em>Age:</em> {{ char.age|default:"N/A" }}</p>
                             <p><em>Gender:</em> {{ char.gender|default:"N/A" }}</p>
+                            <p><em>Primary Goal:</em> {{ char.primary_goal|default:"N/A" }}</p>
+                            <p><em>Secondary Goals:</em> {{ char.secondary_goals|default:"N/A" }}</p>
+                            <p><em>Key Motivations:</em> {{ char.key_motivations|default:"N/A" }}</p>
+                            <p><em>Character Arc Summary:</em> {{ char.character_arc_summary|default:"N/A" }}</p>
+                            <p><em>Strengths:</em> {{ char.strengths|default:"N/A" }}</p>
+                            <p><em>Weaknesses:</em> {{ char.weaknesses|default:"N/A" }}</p>
+                            <p><em>Internal Conflict:</em> {{ char.internal_conflict|default:"N/A" }}</p>
+                            <p><em>External Conflict:</em> {{ char.external_conflict|default:"N/A" }}</p>
                             {% if char.relationships %}
                                 <p><em>Relationships:</em></p>
                                 <ul>
@@ -68,7 +76,11 @@
                     {% for plot in raw_data.project.plot_points %}
                         <li>
                             <strong>{{ plot.title }} (Order: {{ plot.order }})</strong>
-                            <p>{{ plot.description }}</p>
+                            <p><em>Narrative Function:</em> {{ plot.narrative_function|default:"N/A" }}</p>
+                            <p><em>Key Events:</em> {{ plot.key_events|default:"N/A" }}</p>
+                            <p><em>Information Revealed:</em> {{ plot.information_revealed_to_reader|default:"N/A" }}</p>
+                            <p><em>Character Development:</em> {{ plot.character_development_achieved|default:"N/A" }}</p>
+                            <p><em>Conflict Introduced/Escalated:</em> {{ plot.conflict_introduced_or_escalated|default:"N/A" }}</p>
                             <p><em>Characters:</em> {{ plot.characters|join:", " }}</p>
                             <p><em>Places:</em> {{ plot.places|join:", " }}</p>
                             <p><em>Organizations:</em> {{ plot.organizations|join:", " }}</p>

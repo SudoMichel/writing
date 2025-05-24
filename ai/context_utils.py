@@ -2,8 +2,8 @@ import json
 from core.serializers import ProjectSerializer
 from core.models import Project # Import Project model for type hinting and potential prefetching examples
 
-def get_project_context(project: Project):
-    """Get the full context of a project using DRF serializers."""
+def get_project_context(project: Project, exclude_fields: list[str] | None = None):
+    """Get the full context of a project using DRF serializers, with dynamic field exclusion."""
     
     # For optimal performance, ensure related data is pre-fetched before passing the project instance here.
     # Example of how you might fetch the project object with prefetching in your view/caller:
@@ -27,7 +27,7 @@ def get_project_context(project: Project):
     #     'attribute_values__attribute'                   # For Project custom attributes
     # ).get(pk=project.pk) # or however you get your project instance
 
-    serializer = ProjectSerializer(project)
+    serializer = ProjectSerializer(project, exclude_fields=exclude_fields)
     context_data = serializer.data # This is already a dictionary
     
     # The ProjectSerializer now wraps its output in a {'project': ...} structure.
@@ -46,3 +46,21 @@ def get_project_context(project: Project):
     llm_context = json.dumps(project_data_for_llm, indent=2, ensure_ascii=False)
             
     return context_data, llm_context 
+
+# Example Usage (can be called from other parts of your AI logic):
+# def generate_prompt_variant_a(project_instance):
+#     # Excludes research notes for this prompt
+#     context_data, llm_context = get_project_context(project_instance, exclude_fields=['research_notes'])
+#     # ... use llm_context to build prompt ...
+#     return llm_context
+
+# def generate_prompt_variant_b(project_instance):
+#     # Excludes chapters and research notes for this prompt
+#     context_data, llm_context = get_project_context(project_instance, exclude_fields=['chapters', 'research_notes'])
+#     # ... use llm_context to build prompt ...
+#     return llm_context
+
+# def get_full_project_llm_context(project_instance):
+#     # Gets all data
+#     _, llm_context = get_project_context(project_instance) # exclude_fields is None by default
+#     return llm_context 

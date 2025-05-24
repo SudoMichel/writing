@@ -211,6 +211,16 @@ class ProjectSerializer(CustomAttributeModelSerializer):
             'organizations', 'chapters', 'research_notes'
         ]
 
+    def __init__(self, *args, **kwargs):
+        # Pop 'exclude_fields' from kwargs before passing to super
+        exclude_fields = kwargs.pop('exclude_fields', None)
+        super().__init__(*args, **kwargs)
+
+        if exclude_fields:
+            for field_name in exclude_fields:
+                if field_name in self.fields:
+                    self.fields.pop(field_name)
+
     def to_representation(self, instance):
         # Get the representation from the parent CustomAttributeModelSerializer.
         # This includes direct project fields and resolved nested serializers.

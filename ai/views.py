@@ -90,7 +90,8 @@ def view_project_context_llm(request, project_id):
 @require_api_key
 def improve_entity_description(request, project_id, entity_type, entity_id):
     project = get_object_or_404(Project, pk=project_id)
-    _, llm_context = get_project_context(project)
+    # Exclude research_notes from the context for this specific view
+    _, llm_context = get_project_context(project, exclude_fields=['research_notes'])
 
     entity, prompt_template, prompt_args, response_key, error_response = \
         _get_entity_config_and_instance(entity_type, entity_id, project)

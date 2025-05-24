@@ -31,4 +31,8 @@ urlpatterns = [
     path('projects/<int:project_id>/chapters/create/', views.chapter_create, name='chapter_create'),
     path('projects/<int:project_id>/chapters/<int:chapter_id>/edit/', views.chapter_edit, name='chapter_edit'),
     path('projects/<int:project_id>/chapters/<int:chapter_id>/delete/', views.chapter_delete, name='chapter_delete'),
+    path('projects/<int:project_id>/attributes/', views.attribute_list, name='attribute_list'),
+    path('projects/<int:project_id>/attributes/create/', views.attribute_create, name='attribute_create'),
+    path('projects/<int:project_id>/attributes/<int:attribute_id>/edit/', views.attribute_edit, name='attribute_edit'),
+    path('projects/<int:project_id>/attributes/<int:attribute_id>/delete/', views.attribute_delete, name='attribute_delete'),
 ] 

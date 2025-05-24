@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load core_extras %}
 
 {% block title %}{{ action }} Project{% endblock %}
 
@@ -36,6 +37,18 @@
                 <strong>Style:</strong> {{ project.style }}
             </div>
             {% endif %}
+
+            {% if custom_attributes %}
+                {% for attr in custom_attributes %}
+                    {% with val=custom_attribute_values|get_item:attr.id %}
+                        {% if val and val.value %}
+                        <div class="project-custom-attribute">
+                            <strong>{{ attr.name }}:</strong> {{ val.value|linebreaks }}
+                        </div>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
     {% else %}
@@ -69,6 +82,15 @@
                 <label for="{{ form.style.id_for_label }}">Style (Optional)</label>
                 {{ form.style }}
             </div>
+            
+            {% if custom_attributes %}
+                {% for attr in custom_attributes %}
+                <div class="form-group">
+                    <label for="custom_attr_{{ attr.id }}">{{ attr.name }}</label>
+                    <input type="text" name="custom_attr_{{ attr.id }}" id="custom_attr_{{ attr.id }}" class="form-control" value="{% with val=custom_attribute_values|get_item:attr.id %}{% if val %}{{ val.value }}{% endif %}{% endwith %}">
+                </div>
+                {% endfor %}
+            {% endif %}
         </div>
 
         <div class="button-group">

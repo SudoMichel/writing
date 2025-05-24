@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Project, Character, CharacterRelationship, Place, Organization, PlotPoint, ResearchNote, Chapter
+from .models import Project, Character, CharacterRelationship, Place, Organization, PlotPoint, ResearchNote, Chapter, AttributeDefinition, CharacterAttributeValue, OrganizationAttributeValue, PlaceAttributeValue, ProjectAttributeValue
 from django.db import models
-from .forms import ProjectForm, CharacterForm, PlaceForm, OrganizationForm, PlotPointForm, ResearchNoteForm, ChapterForm
+from .forms import ProjectForm, CharacterForm, PlaceForm, OrganizationForm, PlotPointForm, ResearchNoteForm, ChapterForm, AttributeDefinitionForm
 
 @login_required
 def project_list(request):
@@ -29,22 +29,56 @@ def project_create(request):
 @login_required
 def project_edit(request, pk):
     project = get_object_or_404(Project, pk=pk, user=request.user)
-    form = ProjectForm(instance=project)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='project')
+    existing_values = {v.attribute_id: v for v in ProjectAttributeValue.objects.filter(project=project)}
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    obj, created = ProjectAttributeValue.objects.update_or_create(
+                        project=project, attribute=attr,
+                        defaults={'value': value}
+                    )
+                else:
+                    ProjectAttributeValue.objects.filter(project=project, attribute=attr).delete()
+            messages.success(request, 'Project updated successfully!')
+            return redirect('project_edit', pk=project.id)
+        else:
+            messages.error(request, 'Please fill in all fields.')
+    else:
+        form = ProjectForm(instance=project)
     return render(request, 'core/project_form.html', {
         'form': form,
         'project': project,
         'trunc': 20,
         'action': 'Save',
-        'editing_project_details': False
+        'editing_project_details': False,
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': existing_values,
     })
 
 @login_required
 def project_details_edit(request, pk):
     project = get_object_or_404(Project, pk=pk, user=request.user)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='project')
+    existing_values = {v.attribute_id: v for v in ProjectAttributeValue.objects.filter(project=project)}
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
-            form.save()
+            project = form.save()
+
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    obj, created = ProjectAttributeValue.objects.update_or_create(
+                        project=project, attribute=attr,
+                        defaults={'value': value}
+                    )
+                else:
+                    ProjectAttributeValue.objects.filter(project=project, attribute=attr).delete()
             messages.success(request, 'Project updated successfully!')
             return redirect('project_edit', pk=project.id)
         else:
@@ -55,7 +89,9 @@ def project_details_edit(request, pk):
         'form': form,
         'project': project,
         'action': 'Save',
-        'editing_project_details': True
+        'editing_project_details': True,
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': existing_values,
     })
 
 @login_required
@@ -80,13 +116,19 @@ def character_list(request, project_id):
 @login_required
 def character_create(request, project_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='character')
     if request.method == 'POST':
         form = CharacterForm(request.POST)
         if form.is_valid():
             character = form.save(commit=False)
             character.project = project
             character.save()
-            # Handle relationships
+
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    CharacterAttributeValue.objects.create(character=character, attribute=attr, value=value)
+
             for other_character in project.characters.all():
                 if other_character.id != character.id:
                     relationship_text = request.POST.get(f'relationship_{other_character.id}')
@@ -105,18 +147,33 @@ def character_create(request, project_id):
     return render(request, 'core/character_form.html', {
         'form': form,
         'project': project,
-        'action': 'Create'
+        'action': 'Create',
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': {},
     })
 
 @login_required
 def character_edit(request, project_id, character_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
     character = get_object_or_404(Character, pk=character_id, project=project)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='character')
+    existing_values = {v.attribute_id: v for v in CharacterAttributeValue.objects.filter(character=character)}
     if request.method == 'POST':
         form = CharacterForm(request.POST, instance=character)
         if form.is_valid():
             character = form.save()
-            # Handle relationships
+
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    obj, created = CharacterAttributeValue.objects.update_or_create(
+                        character=character, attribute=attr,
+                        defaults={'value': value}
+                    )
+                else:
+                  
+                    CharacterAttributeValue.objects.filter(character=character, attribute=attr).delete()
+   
             for other_character in project.characters.all():
                 if other_character.id != character.id:
                     relationship_text = request.POST.get(f'relationship_{other_character.id}')
@@ -135,7 +192,7 @@ def character_edit(request, project_id, character_id):
             messages.error(request, 'Please fill in all required fields.')
     else:
         form = CharacterForm(instance=character)
-    # Get existing relationships
+
     relationships = {}
     for rel in character.relationships_from.all():
         relationships[rel.to_character.id] = rel.description
@@ -144,7 +201,9 @@ def character_edit(request, project_id, character_id):
         'project': project,
         'character': character,
         'action': 'Edit',
-        'relationships': relationships
+        'relationships': relationships,
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': existing_values,
     })
 
 @login_required
@@ -175,6 +234,7 @@ def place_list(request, project_id):
 @login_required
 def place_create(request, project_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='place')
     if request.method == 'POST':
         form = PlaceForm(request.POST)
         if form.is_valid():
@@ -182,6 +242,11 @@ def place_create(request, project_id):
             place.project = project
             place.save()
             form.save_m2m()
+         
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    PlaceAttributeValue.objects.create(place=place, attribute=attr, value=value)
             messages.success(request, 'Place created successfully!')
             return redirect('project_edit', pk=project.id)
         else:
@@ -191,19 +256,34 @@ def place_create(request, project_id):
     form.fields['characters'].queryset = project.characters.all()
     return render(request, 'core/place_form.html', {
         'form': form,
-        'project': project, 
+        'project': project,
         'action': 'Create',
-        'characters': project.characters.all()
+        'characters': project.characters.all(),
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': {},
     })
 
 @login_required
 def place_edit(request, project_id, place_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
     place = get_object_or_404(Place, pk=place_id, project=project)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='place')
+    existing_values = {v.attribute_id: v for v in PlaceAttributeValue.objects.filter(place=place)}
     if request.method == 'POST':
         form = PlaceForm(request.POST, instance=place)
         if form.is_valid():
             place = form.save()
+            form.save_m2m()
+        
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    obj, created = PlaceAttributeValue.objects.update_or_create(
+                        place=place, attribute=attr,
+                        defaults={'value': value}
+                    )
+                else:
+                    PlaceAttributeValue.objects.filter(place=place, attribute=attr).delete()
             messages.success(request, 'Place updated successfully!')
             return redirect('project_edit', pk=project.id)
         else:
@@ -213,10 +293,12 @@ def place_edit(request, project_id, place_id):
     form.fields['characters'].queryset = project.characters.all()
     return render(request, 'core/place_form.html', {
         'form': form,
-        'project': project, 
-        'place': place, 
+        'project': project,
+        'place': place,
         'action': 'Edit',
-        'characters': project.characters.all()
+        'characters': project.characters.all(),
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': existing_values,
     })
 
 @login_required
@@ -242,6 +324,7 @@ def organization_list(request, project_id):
 @login_required
 def organization_create(request, project_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='organization')
     if request.method == 'POST':
         form = OrganizationForm(request.POST)
         if form.is_valid():
@@ -249,6 +332,11 @@ def organization_create(request, project_id):
             organization.project = project
             organization.save()
             form.save_m2m()
+     
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    OrganizationAttributeValue.objects.create(organization=organization, attribute=attr, value=value)
             messages.success(request, 'Organization created successfully!')
             return redirect('project_edit', pk=project.id)
         else:
@@ -262,17 +350,32 @@ def organization_create(request, project_id):
         'project': project,
         'action': 'Create',
         'characters': project.characters.all(),
-        'places': project.places.all()
+        'places': project.places.all(),
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': {},
     })
 
 @login_required
 def organization_edit(request, project_id, organization_id):
     project = get_object_or_404(Project, pk=project_id, user=request.user)
     organization = get_object_or_404(Organization, pk=organization_id, project=project)
+    custom_attributes = AttributeDefinition.objects.filter(project=project, target_type='organization')
+    existing_values = {v.attribute_id: v for v in OrganizationAttributeValue.objects.filter(organization=organization)}
     if request.method == 'POST':
         form = OrganizationForm(request.POST, instance=organization)
         if form.is_valid():
             organization = form.save()
+            form.save_m2m()
+ 
+            for attr in custom_attributes:
+                value = request.POST.get(f'custom_attr_{attr.id}', '').strip()
+                if value:
+                    obj, created = OrganizationAttributeValue.objects.update_or_create(
+                        organization=organization, attribute=attr,
+                        defaults={'value': value}
+                    )
+                else:
+                    OrganizationAttributeValue.objects.filter(organization=organization, attribute=attr).delete()
             messages.success(request, 'Organization updated successfully!')
             return redirect('project_edit', pk=project.id)
         else:
@@ -287,7 +390,9 @@ def organization_edit(request, project_id, organization_id):
         'organization': organization,
         'action': 'Edit',
         'characters': project.characters.all(),
-        'places': project.places.all()
+        'places': project.places.all(),
+        'custom_attributes': custom_attributes,
+        'custom_attribute_values': existing_values,
     })
 
 @login_required
@@ -475,7 +580,7 @@ def chapter_create(request, project_id):
             chapter.project = project
             chapter.save()
             form.save_m2m()
-            # Handle plot point associations
+          
             plot_point_ids = request.POST.getlist('plot_points')
             if plot_point_ids:
                 plot_points = PlotPoint.objects.filter(id__in=plot_point_ids, project=project)
@@ -512,9 +617,9 @@ def chapter_edit(request, project_id, chapter_id):
         form = ChapterForm(request.POST, instance=chapter)
         if form.is_valid():
             chapter = form.save()
-            # First, clear any existing plot point associations
+
             PlotPoint.objects.filter(chapter=chapter).update(chapter=None)
-            # Then associate selected plot points with this chapter
+            
             plot_point_ids = request.POST.getlist('plot_points')
             if plot_point_ids:
                 plot_points = PlotPoint.objects.filter(id__in=plot_point_ids, project=project)
@@ -558,4 +663,68 @@ def chapter_delete(request, project_id, chapter_id):
     return render(request, 'core/chapter_confirm_delete.html', {
         'project': project,
         'chapter': chapter
+    })
+
+@login_required
+def attribute_list(request, project_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    attributes = AttributeDefinition.objects.filter(project=project)
+    return render(request, 'core/attribute_list.html', {
+        'project': project,
+        'attributes': attributes,
+    })
+
+@login_required
+def attribute_create(request, project_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    if request.method == 'POST':
+        form = AttributeDefinitionForm(request.POST)
+        if form.is_valid():
+            attribute = form.save(commit=False)
+            attribute.project = project
+            attribute.save()
+            messages.success(request, 'Attribute created successfully!')
+            return redirect('attribute_list', project_id=project.id)
+        else:
+            messages.error(request, 'Please fill in all fields.')
+    else:
+        form = AttributeDefinitionForm()
+    return render(request, 'core/attribute_form.html', {
+        'form': form,
+        'project': project,
+        'action': 'Create'
+    })
+
+@login_required
+def attribute_edit(request, project_id, attribute_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    attribute = get_object_or_404(AttributeDefinition, pk=attribute_id, project=project)
+    if request.method == 'POST':
+        form = AttributeDefinitionForm(request.POST, instance=attribute)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Attribute updated successfully!')
+            return redirect('attribute_list', project_id=project.id)
+        else:
+            messages.error(request, 'Please fill in all fields.')
+    else:
+        form = AttributeDefinitionForm(instance=attribute)
+    return render(request, 'core/attribute_form.html', {
+        'form': form,
+        'project': project,
+        'attribute': attribute,
+        'action': 'Edit'
+    })
+
+@login_required
+def attribute_delete(request, project_id, attribute_id):
+    project = get_object_or_404(Project, pk=project_id, user=request.user)
+    attribute = get_object_or_404(AttributeDefinition, pk=attribute_id, project=project)
+    if request.method == 'POST':
+        attribute.delete()
+        messages.success(request, 'Attribute deleted successfully!')
+        return redirect('attribute_list', project_id=project.id)
+    return render(request, 'core/attribute_confirm_delete.html', {
+        'project': project,
+        'attribute': attribute
     })

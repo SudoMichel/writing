@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>Delete Attribute</h2>
+<p>Are you sure you want to delete the attribute <strong>{{ attribute.name }}</strong> ({{ attribute.get_target_type_display }})?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'attribute_list' project.id %}" class="btn btn-link">Cancel</a>
+</form>
+{% endblock %} 

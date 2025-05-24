@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>Custom Attributes for {{ project.name }}</h2>
+<a href="{% url 'attribute_create' project.id %}" class="btn btn-primary mb-3">Add Attribute</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Target Type</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attribute in attributes %}
+        <tr>
+            <td>{{ attribute.name }}</td>
+            <td>{{ attribute.get_target_type_display }}</td>
+            <td>
+                <a href="{% url 'attribute_edit' project.id attribute.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{% url 'attribute_delete' project.id attribute.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No custom attributes defined.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'project_edit' project.id %}" class="btn btn-link">Back to Project</a>
+{% endblock %} 

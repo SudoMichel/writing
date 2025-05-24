@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>{{ action }} Attribute for {{ project.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">{{ action }}</button>
+    <a href="{% url 'attribute_list' project.id %}" class="btn btn-link">Cancel</a>
+</form>
+{% endblock %} 

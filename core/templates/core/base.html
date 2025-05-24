@@ -17,6 +17,7 @@
             {% if project %}
             <a href="{% url 'ai:view_project_context_html' project_id=project.pk %}">Project Details</a>
             <a href="{% url 'ai:view_project_context_llm' project_id=project.pk %}">LLM Context</a>
+            <a href="{% url 'attribute_list' project.id %}">Custom Attributes</a>
             {% endif %}
         {% else %}
             <a href="{% url 'login' %}">Login</a>

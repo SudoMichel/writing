@@ -1,14 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Project(models.Model):
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class Project(TimeStampedModel):
     name = models.CharField(max_length=200)
     description = models.TextField()
     core_premise = models.TextField(blank=True, null=True)
     key_themes = models.TextField(blank=True, null=True, help_text="Enter key themes, separated by commas")
     genre = models.CharField(max_length=100, blank=True, null=True)
     style = models.CharField(max_length=200, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
 
     def __str__(self):
@@ -17,7 +23,7 @@ class Project(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-class Character(models.Model):
+class Character(TimeStampedModel):
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=100)
     description = models.TextField()
@@ -34,7 +40,6 @@ class Character(models.Model):
     internal_conflict = models.TextField(blank=True, null=True, help_text="Describe internal conflicts, separated by semicolons")
     external_conflict = models.TextField(blank=True, null=True, help_text="Describe external conflicts, separated by semicolons")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='characters')
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} ({self.role})"
@@ -42,11 +47,10 @@ class Character(models.Model):
     class Meta:
         ordering = ['name']
 
-class CharacterRelationship(models.Model):
+class CharacterRelationship(TimeStampedModel):
     from_character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name='relationships_from')
     to_character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name='relationships_to')
     description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -55,7 +59,7 @@ class CharacterRelationship(models.Model):
     def __str__(self):
         return f"{self.from_character.name} → {self.to_character.name}: {self.description}"
 
-class Place(models.Model):
+class Place(TimeStampedModel):
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=100)
     description = models.TextField()
@@ -65,7 +69,6 @@ class Place(models.Model):
     summary = models.TextField(blank=True, null=True, help_text="A brief summary of the place.")
     characters = models.ManyToManyField(Character, related_name='places', blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='places')
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} ({self.type})"
@@ -73,7 +76,7 @@ class Place(models.Model):
     class Meta:
         ordering = ['name']
 
-class Organization(models.Model):
+class Organization(TimeStampedModel):
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -85,7 +88,6 @@ class Organization(models.Model):
     characters = models.ManyToManyField(Character, related_name='organizations', blank=True)
     places = models.ManyToManyField(Place, related_name='organizations', blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='organizations')
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -93,7 +95,7 @@ class Organization(models.Model):
     class Meta:
         ordering = ['name']
 
-class Chapter(models.Model):
+class Chapter(TimeStampedModel):
     title = models.CharField(max_length=200)
     chapter_number = models.IntegerField(default=1)
     notes = models.TextField(blank=True)
@@ -103,7 +105,6 @@ class Chapter(models.Model):
     places = models.ManyToManyField(Place, related_name='chapters', blank=True)
     organizations = models.ManyToManyField(Organization, related_name='chapters', blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='chapters')
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Chapter {self.chapter_number}: {self.title}"
@@ -111,7 +112,7 @@ class Chapter(models.Model):
     class Meta:
         ordering = ['chapter_number', 'created_at']
 
-class PlotPoint(models.Model):
+class PlotPoint(TimeStampedModel):
     title = models.CharField(max_length=200)
     narrative_function = models.TextField(blank=True, null=True, help_text="Describe the narrative function, items separated by semicolons")
     order = models.IntegerField(default=0)
@@ -124,7 +125,6 @@ class PlotPoint(models.Model):
     organizations = models.ManyToManyField(Organization, related_name='plot_points', blank=True)
     chapter = models.ForeignKey(Chapter, on_delete=models.SET_NULL, related_name='plot_points', null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='plot_points')
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.order}. {self.title}"
@@ -132,17 +132,89 @@ class PlotPoint(models.Model):
     class Meta:
         ordering = ['order', 'created_at']
 
-class ResearchNote(models.Model):
+class ResearchNote(TimeStampedModel):
     title = models.CharField(max_length=200)
     content = models.TextField()
     tags = models.CharField(max_length=500, blank=True, help_text="Enter tags separated by commas")
     file = models.FileField(upload_to='research_notes/', blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='research_notes')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
         ordering = ['-updated_at']
+
+
+class AttributeDefinition(TimeStampedModel):
+    TARGET_CHOICES = [
+        ('project', 'Project'),
+        ('character', 'Character'),
+        ('place', 'Place'),
+        ('organization', 'Organization'),
+    ]
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="attribute_definitions")
+    name = models.CharField(max_length=100)
+    target_type = models.CharField(max_length=20, choices=TARGET_CHOICES)
+
+    class Meta:
+        unique_together = ('project', 'name', 'target_type')
+
+    def __str__(self):
+        return f"{self.name} ({self.project.name} → {self.target_type})"
+
+class BaseAttributeValue(TimeStampedModel):
+    attribute = models.ForeignKey(AttributeDefinition, on_delete=models.CASCADE, related_name="%(class)s_values")
+    value = models.TextField()
+
+    class Meta:
+        abstract = True
+
+class CharacterAttributeValue(BaseAttributeValue):
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="attribute_values")
+
+    class Meta:
+        unique_together = ('character', 'attribute')
+
+    def __str__(self):
+        return f"{self.character.name}: {self.attribute.name} = {self.value}"
+
+    def get_expected_target_type(self):
+        return 'character'
+
+class PlaceAttributeValue(BaseAttributeValue):
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="attribute_values")
+
+    class Meta:
+        unique_together = ('place', 'attribute')
+
+    def __str__(self):
+        return f"{self.place.name}: {self.attribute.name} = {self.value}"
+
+    def get_expected_target_type(self):
+        return 'place'
+
+class OrganizationAttributeValue(BaseAttributeValue):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="attribute_values")
+
+    class Meta:
+        unique_together = ('organization', 'attribute')
+
+    def __str__(self):
+        return f"{self.organization.name}: {self.attribute.name} = {self.value}"
+
+    def get_expected_target_type(self):
+        return 'organization'
+
+class ProjectAttributeValue(BaseAttributeValue):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="attribute_values")
+
+    class Meta:
+        unique_together = ('project', 'attribute')
+
+    def __str__(self):
+        return f"{self.project.name}: {self.attribute.name} = {self.value}"
+
+    def get_expected_target_type(self):
+        return 'project'

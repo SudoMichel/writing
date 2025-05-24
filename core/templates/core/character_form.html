@@ -97,8 +97,19 @@
                 <label for="{{ form.external_conflict.id_for_label }}">External Conflict</label>
                 {{ form.external_conflict }}
             </div>
+
+            {% if custom_attributes %}
+                {% for attr in custom_attributes %}
+                <div class="form-group">
+                    <label for="custom_attr_{{ attr.id }}">{{ attr.name }}</label>
+                    <input type="text" name="custom_attr_{{ attr.id }}" id="custom_attr_{{ attr.id }}" class="form-control" value="{% with val=custom_attribute_values|get_item:attr.id %}{% if val %}{{ val.value }}{% endif %}{% endwith %}">
+                </div>
+                {% endfor %}
+            {% endif %}
         </div>
         
+        
+
         {% if project.characters.count > 1 %}
         <div class="form-section">
             <h2>Relationships</h2>
@@ -118,6 +129,8 @@
             </div>
         </div>
         {% endif %}
+        
+        
         
         <div class="button-group">
             <button type="submit" class="btn">Save Character</button>

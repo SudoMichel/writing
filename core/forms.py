@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, Character, Place, Organization, Chapter, PlotPoint, ResearchNote
+from .models import Project, Character, Place, Organization, Chapter, PlotPoint, ResearchNote, AttributeDefinition
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -79,4 +79,9 @@ class PlotPointForm(forms.ModelForm):
 class ResearchNoteForm(forms.ModelForm):
     class Meta:
         model = ResearchNote
-        fields = ['title', 'content', 'tags', 'file'] 
+        fields = ['title', 'content', 'tags', 'file']
+
+class AttributeDefinitionForm(forms.ModelForm):
+    class Meta:
+        model = AttributeDefinition
+        fields = ['name', 'target_type'] 

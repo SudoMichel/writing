@@ -21,7 +21,7 @@ class Character(models.Model):
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=100)
     description = models.TextField()
-    traits = models.TextField(blank=True, null=True, help_text="Enter character traits, separated by semicolons (e.g., Brave; Loyal; Quick-tempered)")
+    traits = models.TextField(blank=True, null=True, help_text="Enter character traits, separated by semicolons")
     appearance = models.TextField(blank=True, null=True)
     age = models.CharField(max_length=50, blank=True, null=True)
     gender = models.CharField(max_length=50, blank=True, null=True)

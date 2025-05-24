@@ -17,27 +17,6 @@
             <div class="project-description">
                 {{ project.description|linebreaks }}
             </div>
-            {% if project.core_premise %}
-            <div class="project-core-premise">
-                <strong>Core Premise:</strong> {{ project.core_premise|linebreaks }}
-            </div>
-            {% endif %}
-            {% if project.key_themes %}
-            <div class="project-key-themes">
-                <strong>Key Themes:</strong> {{ project.key_themes|linebreaks }}
-            </div>
-            {% endif %}
-            {% if project.genre %}
-            <div class="project-genre">
-                <strong>Genre:</strong> {{ project.genre }}
-            </div>
-            {% endif %}
-            {% if project.style %}
-            <div class="project-style">
-                <strong>Style:</strong> {{ project.style }}
-            </div>
-            {% endif %}
-
             {% if custom_attributes %}
                 {% for attr in custom_attributes %}
                     {% with val=custom_attribute_values|get_item:attr.id %}
@@ -65,22 +44,6 @@
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}">Description</label>
                 {{ form.description }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.core_premise.id_for_label }}">Core Premise (Optional)</label>
-                {{ form.core_premise }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.key_themes.id_for_label }}">Key Themes (Optional, comma-separated)</label>
-                {{ form.key_themes }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.genre.id_for_label }}">Genre (Optional)</label>
-                {{ form.genre }}
-            </div>
-            <div class="form-group">
-                <label for="{{ form.style.id_for_label }}">Style (Optional)</label>
-                {{ form.style }}
             </div>
             
             {% if custom_attributes %}

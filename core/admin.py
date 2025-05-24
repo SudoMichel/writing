@@ -3,16 +3,12 @@ from .models import Project, Character, CharacterRelationship, Place, Organizati
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'genre', 'style', 'created_at', 'core_premise', 'key_themes')
-    list_filter = ('user', 'genre', 'style', 'created_at')
-    search_fields = ('name', 'description', 'core_premise', 'key_themes')
+    list_display = ('name', 'user', 'created_at')
+    list_filter = ('user', 'created_at')
+    search_fields = ('name', 'description')
     fieldsets = (
         (None, {
-            'fields': ('name', 'description', 'core_premise', 'key_themes', 'user')
-        }),
-        ('Details', {
-            'fields': ('genre', 'style'),
-            'classes': ('collapse',)
+            'fields': ('name', 'description', 'user')
         }),
     )
 

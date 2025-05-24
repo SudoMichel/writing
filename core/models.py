@@ -11,10 +11,6 @@ class TimeStampedModel(models.Model):
 class Project(TimeStampedModel):
     name = models.CharField(max_length=200)
     description = models.TextField()
-    core_premise = models.TextField(blank=True, null=True)
-    key_themes = models.TextField(blank=True, null=True, help_text="Enter key themes, separated by commas")
-    genre = models.CharField(max_length=100, blank=True, null=True)
-    style = models.CharField(max_length=200, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
 
     def __str__(self):
